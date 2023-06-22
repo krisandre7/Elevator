@@ -1,20 +1,22 @@
+#include <Arduino.h>
 #include "Monitor.h"
 
 int finishTime = 25;
 
-Monitor monitor;
+Monitor *monitor;
 
 bool active;
 
 void setup() {
     Serial.begin(115200);
-
-    monitor.setupCommand();
+    esp_log_level_set("*", ESP_LOG_VERBOSE);
+    monitor = Monitor::GetInstance();
+    monitor->setupCommand();
 }
 
 int t = 0;
 
 void loop() {
-    monitor.commandLoop();
+    monitor->commandLoop();
     delay(20);
 }

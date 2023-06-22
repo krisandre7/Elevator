@@ -9,7 +9,23 @@
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
 Monitor::Monitor() {}
-Monitor::~Monitor() {}
+
+Monitor* Monitor::singleton_= nullptr;;
+
+/**
+ * Static methods should be defined outside the class.
+ */
+Monitor *Monitor::GetInstance()
+{
+    /**
+     * This is a safer way to create an instance. instance = new Monitor is
+     * dangeruous in case two instance threads wants to access at the same time
+     */
+    if(singleton_==nullptr){
+        singleton_ = new Monitor();
+    }
+    return singleton_;
+}
 
 void Monitor::setupCommand() {
     // Criação da fábrica de lógica

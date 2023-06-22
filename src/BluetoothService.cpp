@@ -11,6 +11,23 @@
 
 int blValue = 3;
 
+BluetoothService* BluetoothService::singleton_= nullptr;;
+
+/**
+ * Static methods should be defined outside the class.
+ */
+BluetoothService *BluetoothService::GetInstance()
+{
+    /**
+     * This is a safer way to create an instance. instance = new BluetoothService is
+     * dangeruous in case two instance threads wants to access at the same time
+     */
+    if(singleton_==nullptr){
+        singleton_ = new BluetoothService();
+    }
+    return singleton_;
+}
+
 class Callback : public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
         std::string value = pCharacteristic->getValue();

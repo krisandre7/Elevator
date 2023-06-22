@@ -24,9 +24,25 @@ class Monitor {
     int startCabin;
     unsigned requestedfloor;
 
+   protected:
+    Monitor();
+    static Monitor *singleton_;
+
    public:
-    Monitor(/* args */);
-    ~Monitor();
+    // Singletons should not be cloneable.
+    Monitor(Monitor &other) = delete;
+
+    // Singletons should not be assignable.
+    void operator=(const Monitor &) = delete;
+
+    /**
+     * This is the static method that controls the access to the
+     * Monitor instance. On the first run, it creates a
+     * Monitor object and places it into the static field. On
+     * subsequent runs, it returns the client existing object stored in the
+     * static field.
+     */
+    static Monitor *GetInstance();
     void setupCommand();
     void commandLoop();
 };
