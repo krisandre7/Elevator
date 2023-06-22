@@ -7,16 +7,14 @@ Monitor monitor;
 bool active;
 
 void setup() {
-  Serial.begin(115200);
+    Serial.begin(115200);
 
-  monitor.setupBluetooth();
-  monitor.setupCommand();
+    monitor.setupCommand();
 }
 
 int t = 0;
 
-
 void loop() {
-  monitor.commandLoop();
-  delay(20);
+    monitor.commandLoop();
+    delay(20);
 }

@@ -1,16 +1,16 @@
-#include "DataRegister.h"
 #include "AsciiToHexa.h"
 #include "CommandBuilder.h"
 #include "CommandUs.h"
+#include "DataRegister.h"
 
 class Monitor {
-private:
+   private:
     /* data */
     CommandBuilder *commandBuilder;
     CommandUs *commandUs;
     DataRegister *dataRegister;
     AsciiToHexa *asciiToHexa;
-    
+
     // Definição da entradas bluetooth
     uint8_t bluetoothData = 0;
     unsigned int currentFloor = 0;
@@ -23,12 +23,10 @@ private:
     int startDoor;
     int startCabin;
     unsigned requestedfloor;
-    int bluetoothCommand;
-public:
+
+   public:
     Monitor(/* args */);
     ~Monitor();
-    void setupBluetooth();
     void setupCommand();
     void commandLoop();
 };
-

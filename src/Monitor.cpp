@@ -11,37 +11,6 @@
 Monitor::Monitor() {}
 Monitor::~Monitor() {}
 
-class Callback : public BLECharacteristicCallbacks {
-    void onWrite(BLECharacteristic *pCharacteristic) {
-        std::string value = pCharacteristic->getValue();
-
-        if (value.length() != 1 || value[0] < 0 || value[0] > 2) {
-            Serial.println("Comando invalido >:]");
-            return;
-        }
-
-        Serial.print("Comando recebido: ");
-        Serial.println((int)value[0]);
-        bluetoothCommand = (int)value[0];
-    }
-};
-
-void Monitor::setupBluetooth() {
-    BLEDevice::init("Elevador Squad 5");
-    BLEServer *pServer = BLEDevice::createServer();
-    BLEService *pService = pServer->createService(SERVICE_UUID);
-    BLECharacteristic *pCharacteristic = pService->createCharacteristic(
-        CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
-
-    pCharacteristic->setCallbacks(new Callback());
-
-    pCharacteristic->setValue("3");
-    pService->start();
-
-    BLEAdvertising *pAdvertising = pServer->getAdvertising();
-    pAdvertising->start();
-}
-
 void Monitor::setupCommand() {
     // Criação da fábrica de lógica
     commandBuilder = new CommandBuilder();
@@ -80,7 +49,7 @@ void Monitor::commandLoop() {
     // commandUs->setCabinState(cabinState);
     // commandUs->setCurrentFloor(currentFloor);
 
-    commandUs->setBluetoothData(bluetoothCommand);
+    commandUs->setBluetoothData(0);
 
     commandUs->doMicroservice();
 
@@ -89,7 +58,7 @@ void Monitor::commandLoop() {
     startDoor = commandUs->getStartDoor();
     startCabin = commandUs->getStartCabin();
     state = commandUs->getState();
-    doorAction = commandUs->getDoorAction();
+    // doorAction = commandUs->getDoorAction();
 
     Serial.print(requestedfloor);
     Serial.print(",");
@@ -97,7 +66,7 @@ void Monitor::commandLoop() {
     Serial.print(",");
     Serial.print(startCabin);
     Serial.print(",");
-    Serial.print(state);
-    Serial.print(",");
-    Serial.print(doorAction);
+    Serial.println(state);
+    // Serial.print(",");
+    // Serial.print(doorAction);
 }
