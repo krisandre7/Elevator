@@ -4,28 +4,25 @@
 #include "DataRegister.h"
 #include "BluetoothService.h"
 
+#include "UpDownCounter.h"
+#include "DoorBuilder.h"
+#include "DoorUs.h"
+
 class Monitor {
    private:
-    /* data */
+    // Command
     CommandBuilder *commandBuilder;
     CommandUs *commandUs;
     DataRegister *dataRegister;
     AsciiToHexa *asciiToHexa;
 
-    // Definição da entradas bluetooth
-    uint8_t bluetoothData = 0;
-    unsigned int currentFloor = 0;
-    DoorAction doorAction = DoorAction::ACT_CLOSED_DOOR;
-    CabinState cabinState = CabinState::S_STOPPED;
-
-    // Definição das saidas
-    int state;
-    int startTest;
-    int startDoor;
-    int startCabin;
-    unsigned requestedfloor;
-
+    // Door
+    DoorBuilder *doorBuilder;
+    DoorUs *doorUs;
+    UpDownCounter *upDownCounter;
     BluetoothService *bluetoothService;
+
+    void prints();
 
    protected:
     Monitor();
@@ -46,6 +43,9 @@ class Monitor {
      * static field.
      */
     static Monitor *GetInstance();
+
     void setupCommand();
+    void setupDoor();
     void commandLoop();
+    void doorLoop();
 };

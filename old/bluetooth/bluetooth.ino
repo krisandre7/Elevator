@@ -32,7 +32,7 @@ CabinState cabinState = CabinState::STOPPED_S;
 // Definição das saidas
 int state;
 int startTest;
-int startDoor;
+int doorStart;
 int startCabin;
 unsigned requestedfloor;
 
@@ -131,7 +131,7 @@ void loop() {
   
   requestedfloor = cmdUs->getRequestedFloor();
   startTest = cmdUs->getStartTest();
-  startDoor = cmdUs->getStartDoor();
+  doorStart = cmdUs->getDoorStart();
   startCabin = cmdUs->getStartCabin();
   state = cmdUs->getState();
 

@@ -293,7 +293,7 @@ protected:
   void incrementQ ()
   {
 
-    if (q >= maximumCount)
+    if (q > maximumCount)
     {
       /*! Caso base: Contagem corrente no valor limite */
       q = 0;
@@ -312,7 +312,7 @@ protected:
    */
   void decrementQ ()
   {
-    if (q <= 0)
+    if (q < 0)
     {
       /*! Caso base: Contagem corrente no valor limite */
       q = maximumCount;

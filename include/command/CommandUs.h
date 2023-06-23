@@ -60,7 +60,6 @@ class CommandUs : public Microservice {
 
     /* Controle do microsserviço */
     CommandState state;  // Estado atual do microsserviço
-    bool start;          // Flag de início de execução do microsserviço
     int classActive,     // Flag de criação de classes
         logicActive,     // Flag de active de componentes camada logica
         startActive;     // startActive
@@ -69,7 +68,7 @@ class CommandUs : public Microservice {
     unsigned int requestedFloor;  // Andar solicitado
     bool startReset;              // Flag de início de reset
     bool startTest;               // Flag de início de teste
-    bool startDoor;               // Flag de início de movimento da porta
+    bool doorStart;               // Flag de início de movimento da porta
     bool startCabin;              // Flag de início de movimento da cabine
     DoorMode doorMode;            // 0 = fechar porta, 1 = abrir porta
 
@@ -92,7 +91,7 @@ class CommandUs : public Microservice {
         requestedFloor = 3;
         startReset = false;
         startTest = false;
-        startDoor = false;
+        doorStart = false;
         startCabin = false;
 
         active = 1;
@@ -102,29 +101,6 @@ class CommandUs : public Microservice {
         setActive();
     }
 
-    // std::string getStateInString(int state) {
-    //   if ( state == 0 )     return "Reset State";
-    //   else if (state == 1)  return "Wait For Reset State";
-    //   else if ( state == 2 ) return "Test Request State";
-    //   else if ( state == 3 ) return "Wait For Test State";
-    //   else if ( state == 4 ) return "Wait Floor Request State";
-    //   else if ( state == 5 ) return "Save Request Floor State";
-    //   else if ( state == 6 ) return "Close Door State";
-    //   else if ( state == 7 ) return "Open Door State";
-    //   else if ( state == 8 ) return "Wait Finish Door State";
-    //   else if ( state == 9 ) return "Move Cabin Door State";
-    //   else if ( state == 10 ) return "Wait Moving Cabin State";
-    //   else return "Noise State";
-    // }
-
-    DoorAction getDoorAction() { return doorAction; }
-
-    /** --------------------------------------------------------------------------
-     * @brief      Ajusta a referência do objeto da classe DataRegister
-     *
-     * @param[in]  reg  -  1, Endereço do objeto DataRegister
-     * ---------------------------------------------------------------------------
-     */
     void setDataRegister(DataRegister *reg = nullptr) {
         if (reg != nullptr) {
             // Guarda a referência do objeto DataRegister
@@ -141,13 +117,6 @@ class CommandUs : public Microservice {
         setActive();
     }
 
-    /** --------------------------------------------------------------------------
-     * @brief      Ajusta a referência do objeto da classe hexa para ascii
-     *
-     * @param[in]  h2a  -  1, Endereço do objeto do Codificador de hexa para
-     * ascii
-     * ---------------------------------------------------------------------------
-     */
     void setAsciiToHexa(AsciiToHexa *a2h = nullptr) {
         if (a2h != nullptr) {
             // Guarda a referência do objeto Codificador
@@ -178,44 +147,6 @@ class CommandUs : public Microservice {
             // Ajusta máquina de estados para requisitar teste */
             state = CommandState::S_TEST_REQUEST;
         }
-    }
-
-    void setBluetoothData(int bluetoothData) {
-        this->bluetoothData = bluetoothData;
-    }
-
-    void setTestIsRunning(unsigned int testIsRunning) {
-        if (testIsRunning == 0 or testIsRunning == 1)
-            this->testIsRunning = testIsRunning;
-        else
-            this->testIsRunning = false;
-    }
-
-    bool getTestIsRunning() { return testIsRunning; }
-
-    void setCurrentFloor(unsigned int currentFloor) {
-        this->currentFloor = currentFloor;
-    }
-
-    void setDoorAction(DoorAction doorAction) { this->doorAction = doorAction; }
-
-    void setDoorAction(int doorAction) {
-        if (doorAction == 0)
-            this->doorAction = DoorAction::ACT_CLOSED_DOOR;
-        else if (doorAction == 1)
-            this->doorAction = DoorAction::ACT_MOVING_DOOR;
-        else if (doorAction == 2)
-            this->doorAction = DoorAction::ACT_OPENED_DOOR;
-        else
-            this->doorAction = DoorAction::ACT_NOISE;
-    }
-
-    void setCabinState(CabinState cabinState) {
-        this->cabinState = cabinState;
-        // if ( cabinState == 1) this->cabinState = CabinState::S_STOPPED;
-        // else if ( cabinState == 2 ) this->cabinState = CabinState::S_TO_UP;
-        // else if ( cabinState == 3 ) this->cabinState = CabinState::S_TO_DOWN;
-        // else this->cabinState = CabinState::S_NOISE;
     }
 
     /** --------------------------------------------------------------------------
@@ -318,7 +249,7 @@ class CommandUs : public Microservice {
                         return;
                     }
 
-                    startDoor = true;
+                    doorStart = true;
                     doorMode = DoorMode::MODE_CLOSE_DOOR;
 
                     if (doorAction == DoorAction::ACT_MOVING_DOOR)
@@ -333,7 +264,7 @@ class CommandUs : public Microservice {
                         return;
                     }
 
-                    startDoor = true;
+                    doorStart = true;
                     doorMode = DoorMode::MODE_OPEN_DOOR;
 
                     if (doorAction == DoorAction::ACT_MOVING_DOOR)
@@ -343,7 +274,7 @@ class CommandUs : public Microservice {
                 }
 
                 case CommandState::S_WAIT_FINISH_DOOR: {
-                    startDoor = false;
+                    doorStart = false;
                     if (doorAction == DoorAction::ACT_OPENED_DOOR) {
                         state = CommandState::S_WAIT_FLOOR_REQUEST;
                     } else if (doorAction == DoorAction::ACT_CLOSED_DOOR) {
@@ -382,24 +313,36 @@ class CommandUs : public Microservice {
         }
     }
 
-    /*!
-     * --------------------------------------------------------------------------
-     *  @brief      Adquire o valor da saída de sinalização.
-     *
-     *  @return     Valor da saída de sinalização.
-     * ---------------------------------------------------------------------------
-     */
     int getActive() { return active; }
+
+        void setBluetoothData(int bluetoothData) {
+        this->bluetoothData = bluetoothData;
+    }
+
+    void setTestIsRunning(unsigned int testIsRunning) {
+        if (testIsRunning == 0 or testIsRunning == 1)
+            this->testIsRunning = testIsRunning;
+        else
+            this->testIsRunning = false;
+    }
+
+    bool getTestIsRunning() { return testIsRunning; }
+
+    void setCurrentFloor(int currentFloor) {
+        this->currentFloor = currentFloor;
+    }
+
+    void setDoorAction(DoorAction doorAction) { this->doorAction = doorAction; }
+
+    void setCabinState(CabinState cabinState) { this->cabinState = cabinState; }
 
     CommandState getState() { return this->state; }
 
-    unsigned int getRequestedFloor() { return reg->getQ(); }
+    int getDoorStart() { return this->doorStart; }
 
-    int getStartTest() { return this->startTest; }
+    DoorMode getDoorMode() { return this->doorMode; }
 
-    int getStartDoor() { return this->startDoor; }
-
-    int getStartCabin() { return this->startCabin; }
+    bool getReset() { return this->startReset; }
 };
 
 #endif  // COMMAND_MICROSSERVICE_H_
