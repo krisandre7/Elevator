@@ -2,6 +2,7 @@
 #include "CommandBuilder.h"
 #include "CommandUs.h"
 #include "DataRegister.h"
+#include "BluetoothService.h"
 
 class Monitor {
    private:
@@ -23,6 +24,8 @@ class Monitor {
     int startDoor;
     int startCabin;
     unsigned requestedfloor;
+
+    BluetoothService *bluetoothService;
 
    protected:
     Monitor();

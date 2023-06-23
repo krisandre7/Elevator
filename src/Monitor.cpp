@@ -1,16 +1,14 @@
 #include "Monitor.h"
+#include "BluetoothService.h"
 
 #include <Arduino.h>
-#include <BLEDevice.h>
-#include <BLEServer.h>
-#include <BLEUtils.h>
 
-#define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+Monitor* Monitor::singleton_= nullptr;
 
-Monitor::Monitor() {}
 
-Monitor* Monitor::singleton_= nullptr;;
+Monitor::Monitor() {
+    BluetoothService *bluetoothService = BluetoothService::GetInstance();
+}
 
 /**
  * Static methods should be defined outside the class.
@@ -28,6 +26,8 @@ Monitor *Monitor::GetInstance()
 }
 
 void Monitor::setupCommand() {
+    bluetoothService->setupBluetooth();
+
     // Criação da fábrica de lógica
     commandBuilder = new CommandBuilder();
 
@@ -76,13 +76,13 @@ void Monitor::commandLoop() {
     state = commandUs->getState();
     // doorAction = commandUs->getDoorAction();
 
-    Serial.print(requestedfloor);
-    Serial.print(",");
-    Serial.print(startDoor);
-    Serial.print(",");
-    Serial.print(startCabin);
-    Serial.print(",");
-    Serial.println(state);
+    // Serial.print(requestedfloor);
+    // Serial.print(",");
+    // Serial.print(startDoor);
+    // Serial.print(",");
+    // Serial.print(startCabin);
+    // Serial.print(",");
+    // Serial.println(state);
     // Serial.print(",");
     // Serial.print(doorAction);
 }

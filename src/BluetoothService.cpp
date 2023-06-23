@@ -1,9 +1,7 @@
 #include "BluetoothService.h"
 
 #include <Arduino.h>
-#include <BLEDevice.h>
-#include <BLEServer.h>
-#include <BLEUtils.h>
+#include <NimBLEDevice.h>
 
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
@@ -11,18 +9,24 @@
 
 int blValue = 3;
 
-BluetoothService* BluetoothService::singleton_= nullptr;;
+BluetoothService *BluetoothService::singleton_ = nullptr;
+
+BluetoothService::BluetoothService()
+    : pServer(nullptr),
+      pService(nullptr),
+      pCharacteristic(nullptr),
+      pAdvertising(nullptr) {}
 
 /**
  * Static methods should be defined outside the class.
  */
-BluetoothService *BluetoothService::GetInstance()
-{
+BluetoothService *BluetoothService::GetInstance() {
     /**
-     * This is a safer way to create an instance. instance = new BluetoothService is
-     * dangeruous in case two instance threads wants to access at the same time
+     * This is a safer way to create an instance. instance = new
+     * BluetoothService is dangeruous in case two instance threads wants to
+     * access at the same time
      */
-    if(singleton_==nullptr){
+    if (singleton_ == nullptr) {
         singleton_ = new BluetoothService();
     }
     return singleton_;
@@ -43,24 +47,24 @@ class Callback : public BLECharacteristicCallbacks {
     }
 };
 
-BluetoothService::BluetoothService() {}
-
 void BluetoothService::setupBluetooth() {
-    BLEDevice::init(DEVICE_NAME);
-    pServer = BLEDevice::createServer();
-    pService = pServer->createService(SERVICE_UUID);
-    pCharacteristic = pService->createCharacteristic(
-        CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
+    BLEDevice::init("MyESP32");
+    BLEServer *pServer = BLEDevice::createServer();
+
+    BLEService *pService = pServer->createService(SERVICE_UUID);
+
+    BLECharacteristic *pCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_UUID, NIMBLE_PROPERTY::WRITE);
 
     pCharacteristic->setCallbacks(new Callback());
 
-    pCharacteristic->setValue("3");
+    pCharacteristic->setValue("Hello World");
     pService->start();
 
-    pAdvertising = pServer->getAdvertising();
+    BLEAdvertising *pAdvertising = pServer->getAdvertising();
     pAdvertising->start();
+
+    Serial.println("Characteristic defined! Now you can read it in your phone!");
 }
 
-int BluetoothService::getValue() {
-    return blValue;
-}
+int BluetoothService::getValue() { return blValue; }

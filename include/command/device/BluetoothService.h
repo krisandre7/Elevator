@@ -1,8 +1,6 @@
 #pragma once
 #include <Arduino.h>
-#include <BLEDevice.h>
-#include <BLEServer.h>
-#include <BLEUtils.h>
+#include <NimBLEDevice.h>
 
 class BluetoothService {
    private:
