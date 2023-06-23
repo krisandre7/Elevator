@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 
+#include "CommandUs.h"
+
 Monitor* Monitor::singleton_= nullptr;
 
 
@@ -65,7 +67,20 @@ void Monitor::commandLoop() {
     // commandUs->setCabinState(cabinState);
     // commandUs->setCurrentFloor(currentFloor);
 
-    commandUs->setBluetoothData(0);
+    if (commandUs->getState() == CommandState::S_TEST_REQUEST) {
+        commandUs->setTestIsRunning(true);
+    } else if (commandUs->getTestIsRunning()) {
+        commandUs->setTestIsRunning(false);
+    }
+
+    if (commandUs->getState() == CommandState::S_WAIT_MOVING_CABIN) {
+        commandUs->setCabinState(CabinState::S_STOPPED);
+    }
+
+    commandUs->setBluetoothData(bluetoothService->getBluetoothValue());
+    Serial.print(bluetoothService->getBluetoothValue());
+    Serial.print(",");
+    Serial.println((int) commandUs->getState());
 
     commandUs->doMicroservice();
 
@@ -73,8 +88,8 @@ void Monitor::commandLoop() {
     startTest = commandUs->getStartTest();
     startDoor = commandUs->getStartDoor();
     startCabin = commandUs->getStartCabin();
-    state = commandUs->getState();
-    // doorAction = commandUs->getDoorAction();
+    state = (int) commandUs->getState();
+    doorAction = commandUs->getDoorAction();
 
     // Serial.print(requestedfloor);
     // Serial.print(",");
@@ -82,7 +97,7 @@ void Monitor::commandLoop() {
     // Serial.print(",");
     // Serial.print(startCabin);
     // Serial.print(",");
-    // Serial.println(state);
+    // Serial.print(state);
     // Serial.print(",");
-    // Serial.print(doorAction);
+    // Serial.println((int) doorAction);
 }

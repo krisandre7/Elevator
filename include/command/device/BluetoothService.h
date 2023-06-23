@@ -32,5 +32,5 @@ class BluetoothService {
 
     void setupBluetooth();
 
-    int getValue();
+    uint8_t getBluetoothValue();
 };

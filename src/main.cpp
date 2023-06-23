@@ -18,5 +18,5 @@ int t = 0;
 
 void loop() {
     monitor->commandLoop();
-    delay(20);
+    delay(1000);
 }

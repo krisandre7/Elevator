@@ -7,7 +7,7 @@
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 #define DEVICE_NAME "Elevador Squad 5"
 
-int blValue = 3;
+uint8_t blValue = '\0';
 
 BluetoothService *BluetoothService::singleton_ = nullptr;
 
@@ -35,15 +35,16 @@ BluetoothService *BluetoothService::GetInstance() {
 class Callback : public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
         std::string value = pCharacteristic->getValue();
+        uint8_t number = '0' + value[0];
 
-        if (value.length() != 1 || value[0] < 0 || value[0] > 2) {
+        if (value.length() != 1 || number < '0' || number > '2') {
             Serial.println("Comando invalido >:]");
             return;
         }
 
         Serial.print("Comando recebido: ");
-        Serial.println((int)value[0]);
-        blValue = (int)value[0];
+        Serial.println(number);
+        blValue = number;
     }
 };
 
@@ -67,4 +68,4 @@ void BluetoothService::setupBluetooth() {
     Serial.println("Characteristic defined! Now you can read it in your phone!");
 }
 
-int BluetoothService::getValue() { return blValue; }
+uint8_t BluetoothService::getBluetoothValue() { return blValue; }
