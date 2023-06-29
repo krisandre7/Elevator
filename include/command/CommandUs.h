@@ -71,6 +71,7 @@ class CommandUs : public Microservice {
     bool doorStart;               // Flag de início de movimento da porta
     bool startCabin;              // Flag de início de movimento da cabine
     DoorMode doorMode;            // 0 = fechar porta, 1 = abrir porta
+    bool isOldValue;
 
    public:
     /** --------------------------------------------------------------------------
@@ -196,7 +197,7 @@ class CommandUs : public Microservice {
                 case CommandState::S_WAIT_FLOOR_REQUEST: {
                     // Serial.print("Ó o dado: ");
                     // Serial.println(bluetoothData);
-                    if (bluetoothData >= '0' && bluetoothData <= '2')
+                    if (!isOldValue && bluetoothData >= '0' && bluetoothData <= '2')
                         state = CommandState::S_SAVE_REQUESTED_FLOOR;
                     return;
                 }
@@ -210,8 +211,6 @@ class CommandUs : public Microservice {
                     a2h->setAscii(bluetoothData);
                     a2h->doEncoder();
 
-                    bluetoothData = '\0';
-
                     if (a2h->getActive()) {
                         unsigned data = a2h->getHexa();
                         reg->setData(data);
@@ -222,11 +221,14 @@ class CommandUs : public Microservice {
                             state = CommandState::S_NOISE;
                         else {
                             requestedFloor = reg->getQ();
-
+                            
                             if (currentFloor != requestedFloor)
-                                state = CommandState::S_MOVE_CABIN;
-                            else
                                 state = CommandState::S_MOVE_DOOR;
+                            else
+                                state = CommandState::S_WAIT_FLOOR_REQUEST;
+                            //     state = CommandState::S_MOVE_CABIN;
+                            // else
+                                // state = CommandState::S_MOVE_DOOR;
                         }
                     } else
                         state = CommandState::S_NOISE;
@@ -340,9 +342,15 @@ class CommandUs : public Microservice {
 
     int getDoorStart() { return this->doorStart; }
 
+    void setIsOldValue(bool oldValue) { this->isOldValue = oldValue; }
+
     DoorMode getDoorMode() { return this->doorMode; }
 
     bool getReset() { return this->startReset; }
+
+    int getCurrentFloor() { return this->currentFloor; }
+
+    int getRequestedFloor() { return this->requestedFloor; }
 };
 
 #endif  // COMMAND_MICROSSERVICE_H_

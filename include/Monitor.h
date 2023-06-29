@@ -11,6 +11,7 @@
 class Monitor {
    private:
     // Command
+    BluetoothService *bluetoothService;
     CommandBuilder *commandBuilder;
     CommandUs *commandUs;
     DataRegister *dataRegister;
@@ -20,7 +21,6 @@ class Monitor {
     DoorBuilder *doorBuilder;
     DoorUs *doorUs;
     UpDownCounter *upDownCounter;
-    BluetoothService *bluetoothService;
 
     void prints();
 

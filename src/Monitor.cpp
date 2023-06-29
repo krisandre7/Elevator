@@ -111,13 +111,19 @@ void Monitor::commandLoop() {
         commandUs->setTestIsRunning(false);
     }
 
+    if (commandUs->getState() == CommandState::S_MOVE_CABIN) {
+        commandUs->setCabinState(bluetoothService->getBluetoothValue() > commandUs->getCurrentFloor()
+            ? CabinState::S_TO_UP : CabinState::S_TO_DOWN);
+    }
+
     if (commandUs->getState() == CommandState::S_WAIT_MOVING_CABIN) {
         commandUs->setCabinState(CabinState::S_STOPPED);
-        commandUs->setCurrentFloor(bluetoothService->getBluetoothValue());
+        commandUs->setCurrentFloor(bluetoothService->getBluetoothValue() - '0');
     }
 
     // entradas
     commandUs->setDoorAction(doorUs->getAction());
+    commandUs->setIsOldValue(bluetoothService->isOldValue());
     commandUs->setBluetoothData(bluetoothService->getBluetoothValue());
 
     prints();
@@ -130,9 +136,12 @@ void Monitor::prints() {
     Serial.print(",");
     Serial.print(doorUs->getAngle());
     Serial.print(",");
-    Serial.print((int) doorUs->getAction());
+    Serial.print(commandUs->getCurrentFloor());
     Serial.print(",");
-    Serial.print((int) commandUs->getDoorMode());
-    Serial.print(",");
-    Serial.println((int) commandUs->getDoorStart());
+    Serial.println(commandUs->getRequestedFloor());
+    // Serial.print((int) doorUs->getAction());
+    // Serial.print(",");
+    // Serial.print((int) commandUs->getDoorMode());
+    // Serial.print(",");
+    // Serial.println((int) commandUs->getDoorStart());
 }
