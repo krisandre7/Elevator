@@ -222,7 +222,7 @@ public:
    *              0, em caso contrário.
    *  --------------------------------------------------------------------------
    */
-  int getGreastThenOut ()
+  int getGreatestThenOut ()
   {
     int   greast;
 

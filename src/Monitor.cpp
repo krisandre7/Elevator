@@ -9,12 +9,16 @@
 
 #include "CabinAction.h"
 #include "CommandState.h"
+#include <Stepper.h>
 
 #define BIT_SIZE 7
 #define MODULE_SIZE 90
 #define PIN_SG90 32
-
 Servo servo;
+
+#define STEPS_PER_REVOLUTION 65 //NÚMERO DE PASSOS POR VOLTA
+#define STEPPER_SPEED 400
+Stepper stepper(STEPS_PER_REVOLUTION, 16, 18, 17, 19); //INICIALIZA O MOTOR
 
 Monitor* Monitor::singleton_= nullptr;
 
@@ -77,11 +81,11 @@ void Monitor::setupCommand() {
     commandUs = new CommandUs();
 
     // Obtenção das lógicas da fábrica
-    dataRegister = commandBuilder->getDataRegister();
+    commandDataRegister = commandBuilder->getDataRegister();
     asciiToHexa = commandBuilder->getAsciiToHexa();
 
     // Configuração dos microsserviços
-    commandUs->setDataRegister(dataRegister);
+    commandUs->setDataRegister(commandDataRegister);
 
     commandUs->setAsciiToHexa(asciiToHexa);
 
@@ -89,6 +93,29 @@ void Monitor::setupCommand() {
     commandUs->setEnable(1);
 
     commandUs->doResetMicroservice();
+}
+
+void Monitor::setupCabin() {
+    cabinBuilder = new CabinBuilder();
+    cabinBuilder->setEnable(true);
+    cabinBuilder->buildComparator();
+    cabinBuilder->buildDataRegister();
+    cabinBuilder->buildDownCounter();
+    
+    cabinUs = new CabinUs();
+
+    cabinDataRegister = cabinBuilder->getDataRegister();
+    comparator = cabinBuilder->getComparator();
+    downCounter = cabinBuilder->getDownCounter();
+
+    cabinUs->setComparator(comparator);
+    cabinUs->setDataRegister(cabinDataRegister);
+    cabinUs->setDownCounter(downCounter);
+
+    cabinUs->setEnable(true);
+    cabinUs->doResetMicroservice();
+
+    stepper.setSpeed(STEPPER_SPEED);
 }
 
 void Monitor::doorLoop() {
@@ -114,22 +141,36 @@ void Monitor::commandLoop() {
         commandUs->setTestIsRunning(false);
     }
 
-    if (commandUs->getState() == CommandState::S_MOVE_CABIN) {
-        commandUs->setCabinAction(bluetoothService->getBluetoothValue() > commandUs->getCurrentFloor()
-            ? CabinAction::S_TO_UP : CabinAction::S_TO_DOWN);
-    }
+    // if (commandUs->getState() == CommandState::S_MOVE_CABIN) {
+    //     commandUs->setCabinAction(bluetoothService->getBluetoothValue() > commandUs->getCurrentFloor()
+    //         ? CabinAction::S_TO_UP : CabinAction::S_TO_DOWN);
+    // }
 
-    if (commandUs->getState() == CommandState::S_WAIT_MOVING_CABIN) {
-        commandUs->setCabinAction(CabinAction::S_STOPPED);
-        commandUs->setCurrentFloor(bluetoothService->getBluetoothValue() - '0');
-    }
+    // if (commandUs->getState() == CommandState::S_WAIT_MOVING_CABIN) {
+    //     commandUs->setCabinAction(CabinAction::S_STOPPED);
+    //     commandUs->setCurrentFloor(bluetoothService->getBluetoothValue() - '0');
+    // }
 
-    // entradas
+    // entradas da porta (a pedido do Fernando)
     commandUs->setDoorAction(doorUs->getAction());
     commandUs->setIsOldValue(bluetoothService->isOldValue());
     commandUs->setBluetoothData(bluetoothService->getBluetoothValue());
 
+    // entradas da cabine
+    commandUs->setCurrentFloor(cabinUs->getCurrentFloor());
+    commandUs->setCabinAction(cabinUs->getCabinAction());
+
     prints();
+}
+
+
+void Monitor::cabinLoop() {
+    cabinUs->doMicroservice();
+
+    cabinUs->setRequestedFloor(commandUs->getRequestedFloor());
+    cabinUs->setStartCabin(commandUs->getStartCabin());
+
+    // stepper.step(cabinUs->getClkwise() ? cabinUs->getSteps() : -cabinUs->getSteps());
 }
 
 void Monitor::prints() {
@@ -137,11 +178,20 @@ void Monitor::prints() {
     Serial.print(",");
     Serial.print((int) commandUs->getState());
     Serial.print(",");
-    Serial.print(doorUs->getAngle());
+    Serial.print((int) cabinUs->getState());
     Serial.print(",");
-    Serial.print(commandUs->getCurrentFloor());
+    Serial.print((int) cabinUs->getCabinAction());
     Serial.print(",");
-    Serial.println(commandUs->getRequestedFloor());
+    Serial.print(commandUs->getRequestedFloor());
+    Serial.print(",");
+    Serial.print(cabinUs->getStartCabin());
+    Serial.print(",");
+    Serial.println(cabinUs->getClkwise());
+    // Serial.print(doorUs->getAngle());
+    // Serial.print(",");
+    // Serial.print(commandUs->getCurrentFloor());
+    // Serial.print(",");
+    // Serial.println(commandUs->getRequestedFloor());
     // Serial.print((int) doorUs->getAction());
     // Serial.print(",");
     // Serial.print((int) commandUs->getDoorMode());

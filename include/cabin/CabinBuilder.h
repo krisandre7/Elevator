@@ -1,6 +1,4 @@
-#ifndef COMMAND_LOGICBUILDER_H_
-#define COMMAND_LOGICBUILDER_H_
-
+#pragma once
 
 #include "Builder.h"
 #include "Compare.h"
@@ -212,6 +210,3 @@ private:
     DataRegister * reg = nullptr;
     Compare * cmp = nullptr;
 };
-
-
-#endif // COMMAND_LOGICBUILDER_H_

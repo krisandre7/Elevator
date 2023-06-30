@@ -2,6 +2,7 @@
 #define CABIN_MICROSSERVICE_H_
 
 #include <string>
+#include <stdbool.h>
 
 #include "Compare.h"
 #include "Microservice.h"
@@ -41,7 +42,7 @@ private:
   int isFinishedReset;
   CabinAction cabinAction;
   int startStepMotor;
-  int clkwise;
+  bool clkwise;
 
 public:
 
@@ -68,6 +69,7 @@ public:
     classActive = 1;
     logicActive = 1;
     startActive = 1;
+    clkwise = false;
     setActive ();
   }
   /** --------------------------------------------------------------------------
@@ -218,7 +220,7 @@ public:
             dc->doSetQ();
 
 
-          if ( cmp->getGreastThenOut() ) {
+          if ( cmp->getGreatestThenOut() ) {
             state = CabinState::MOVE_TO_UP;
             cabinAction = CabinAction::S_TO_UP;
             return;
@@ -341,7 +343,7 @@ public:
     return this->state;
   }
 
-  CabinAction getCabinState() {
+  CabinAction getCabinAction() {
     return this->cabinAction;
   }
 
@@ -365,7 +367,7 @@ public:
 	  return this->startStepMotor;
   }
 
-  int getClkwise() {
+  bool getClkwise() {
       return clkwise;
   }
 };

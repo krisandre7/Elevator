@@ -3,6 +3,10 @@
 #include "CommandUs.h"
 #include "DataRegister.h"
 #include "BluetoothService.h"
+#include "Compare.h"
+#include "DownCounter.h"
+#include "CabinBuilder.h"
+#include "CabinUs.h"
 
 #include "UpDownCounter.h"
 #include "DoorBuilder.h"
@@ -14,13 +18,20 @@ class Monitor {
     BluetoothService *bluetoothService;
     CommandBuilder *commandBuilder;
     CommandUs *commandUs;
-    DataRegister *dataRegister;
+    DataRegister *commandDataRegister;
     AsciiToHexa *asciiToHexa;
 
     // Door
     DoorBuilder *doorBuilder;
     DoorUs *doorUs;
     UpDownCounter *upDownCounter;
+
+    // Cabin
+    CabinBuilder *cabinBuilder;
+    CabinUs *cabinUs;
+    DataRegister *cabinDataRegister;
+    Compare *comparator;
+    DownCounter *downCounter;
 
     void prints();
 
@@ -46,6 +57,8 @@ class Monitor {
 
     void setupCommand();
     void setupDoor();
+    void setupCabin();
     void commandLoop();
     void doorLoop();
+    void cabinLoop();
 };
