@@ -20,8 +20,6 @@ public:
     /*! Configura as entradas do microsserviço */
     mode       = 0;
     reset      = 0;
-    andar      = 0; //[0,2]
-    updownstop = 0; // 0 - parado, 1 - descendo, 2 - subindo
     start      = 0;
     
     /*! Ajusta a saída de sinalização */
