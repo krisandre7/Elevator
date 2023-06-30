@@ -6,7 +6,7 @@
 #include "AsciiToHexa.h"
 #include "DataRegister.h"
 
-class CommandBuilder:public Builder {
+class CommandBuilder:public Builder{
 
 public:
 

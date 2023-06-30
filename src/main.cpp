@@ -14,6 +14,8 @@ void setup() {
     monitor->setupCommand();
     monitor->setupCabin();
     monitor->setupDoor();
+    monitor->setupCommand();
+    monitor->setupDisplay();
 }
 
 int t = 0;
@@ -22,5 +24,7 @@ void loop() {
     monitor->commandLoop();
     monitor->cabinLoop();
     monitor->doorLoop();
+    monitor->commandLoop();
+    monitor->displayLoop();
     delay(50);
 }

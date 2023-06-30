@@ -331,6 +331,8 @@ class CommandUs : public Microservice {
 
     int getRequestedFloor() { return this->requestedFloor; }
 
+    CabinAction getCabinAction(){ return this->cabinAction; }
+
     bool getStartCabin() { return this->startCabin; }
 };
 

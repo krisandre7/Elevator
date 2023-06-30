@@ -12,6 +12,9 @@
 #include "DoorBuilder.h"
 #include "DoorUs.h"
 
+#include "DisplayBuilder.h"
+#include "DisplayUs.h"
+
 class Monitor {
    private:
     // Command
@@ -33,6 +36,9 @@ class Monitor {
     Compare *comparator;
     DownCounter *downCounter;
 
+    // Display
+    DisplayBuilder *displayBuilder;
+    DisplayUs *displayUs;
     void prints();
 
    protected:
@@ -55,10 +61,12 @@ class Monitor {
      */
     static Monitor *GetInstance();
 
+    void setupDisplay();
     void setupCommand();
     void setupDoor();
     void setupCabin();
     void commandLoop();
     void doorLoop();
     void cabinLoop();
+    void displayLoop();
 };

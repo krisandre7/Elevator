@@ -11,9 +11,15 @@
 #include "CommandState.h"
 #include <Stepper.h>
 
+#include "DisplayUs.h"
+#include "DisplayBuilder.h"
+
 #define BIT_SIZE 7
 #define MODULE_SIZE 90
 #define PIN_SG90 32
+#define PIN_CLK 17
+#define PIN_DIO 16
+
 Servo servo;
 
 #define STEPS_PER_REVOLUTION 65 //NÚMERO DE PASSOS POR VOLTA
@@ -118,6 +124,20 @@ void Monitor::setupCabin() {
     stepper.setSpeed(STEPPER_SPEED);
 }
 
+void Monitor::setupDisplay(){
+    displayBuilder = new DisplayBuilder();
+
+    displayBuilder->setEnable(1);
+    displayBuilder->buildDisplay(PIN_CLK,PIN_DIO);
+    displayBuilder->setupDisplay();
+
+    displayUs = new DisplayUs();
+    
+    displayUs->setEnable(1);
+
+    displayUs->doResetMicroservice();
+}
+
 void Monitor::doorLoop() {
     doorUs->doMicroservice();    
 
@@ -173,6 +193,18 @@ void Monitor::cabinLoop() {
     stepper.step(cabinUs->getClkwise() ? cabinUs->getSteps() : -cabinUs->getSteps());
 }
 
+void Monitor::displayLoop(){
+
+    if(displayUs->getState()==DisplayState::S_TEST){
+        displayBuilder->setAllDigits();
+        displayBuilder->printDataDisplay();
+    }
+    if(displayUs->getState()==DisplayState::S_SHOW){
+        displayBuilder->setData(commandUs->getCabinAction(),commandUs->getCurrentFloor());
+        displayBuilder->printDataDisplay();
+    }
+    displayUs->doMicroservice();
+}
 void Monitor::prints() {
     Serial.print(bluetoothService->getBluetoothValue());
     Serial.print(",");
