@@ -3,7 +3,7 @@
  *
  * @brief       Classe abstrata da fábrica de objetos.
  *
- * @file        BlueetoothBuilder.h
+ * @file        Builder.h
  * @version     1.0
  * @date        27 Julho 2021
  *
@@ -49,7 +49,7 @@
 #define C__USERS_MIGUELGRIMM_DESKTOP_CPPLINT_MASTER_BUILDER_H_
 
 
-class BlueetoothBuilder
+class Builder
 {
 
 
@@ -57,7 +57,7 @@ public:
 
 
   /*! Configuração da fábrica */
-  BlueetoothBuilder ()
+  Builder ()
   {
     /*! Configura as entradas da fábrica */
     enable       = 0;
@@ -76,7 +76,7 @@ public:
     if ((enable >= 0) && (enable <= 1))
     {
       /*! Ajusta a entrada de habilita */
-      BlueetoothBuilder::enable = enable;
+      Builder::enable = enable;
          
       /*! Ajusta a saída de sinalização */
       enableActive = 1;

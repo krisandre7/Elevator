@@ -330,6 +330,8 @@ class CommandUs : public Microservice {
     int getCurrentFloor() { return this->currentFloor; }
 
     int getRequestedFloor() { return this->requestedFloor; }
+
+    bool getStartCabin() { return this->startCabin; }
 };
 
 #endif  // COMMAND_MICROSSERVICE_H_
