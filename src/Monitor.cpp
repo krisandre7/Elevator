@@ -170,7 +170,7 @@ void Monitor::cabinLoop() {
     cabinUs->setRequestedFloor(commandUs->getRequestedFloor());
     cabinUs->setStartCabin(commandUs->getStartCabin());
 
-    // stepper.step(cabinUs->getClkwise() ? cabinUs->getSteps() : -cabinUs->getSteps());
+    stepper.step(cabinUs->getClkwise() ? cabinUs->getSteps() : -cabinUs->getSteps());
 }
 
 void Monitor::prints() {
