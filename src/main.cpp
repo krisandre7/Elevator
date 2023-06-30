@@ -13,6 +13,7 @@ void setup() {
     monitor = Monitor::GetInstance();
     monitor->setupDoor();
     monitor->setupCommand();
+    monitor->setupDisplay();
 }
 
 int t = 0;
@@ -20,5 +21,5 @@ int t = 0;
 void loop() {
     monitor->doorLoop();
     monitor->commandLoop();
-    delay(50);
+    monitor->displayLoop();
 }
