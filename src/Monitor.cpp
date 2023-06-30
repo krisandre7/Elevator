@@ -17,8 +17,8 @@
 #define BIT_SIZE 7
 #define MODULE_SIZE 90
 #define PIN_SG90 32
-#define PIN_CLK 17
-#define PIN_DIO 16
+#define PIN_DISPLAY_CLK 14
+#define PIN_DISPLAY_DIO 12
 
 Servo servo;
 
@@ -128,7 +128,7 @@ void Monitor::setupDisplay(){
     displayBuilder = new DisplayBuilder();
 
     displayBuilder->setEnable(1);
-    displayBuilder->buildDisplay(PIN_CLK,PIN_DIO);
+    displayBuilder->buildDisplay(PIN_DISPLAY_CLK, PIN_DISPLAY_DIO);
     displayBuilder->setupDisplay();
 
     displayUs = new DisplayUs();
