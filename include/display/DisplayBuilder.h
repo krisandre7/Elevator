@@ -77,11 +77,11 @@ public:
     return data;
   }
 
-  void setData(int updownstop,int andar){
-    data[0]=data[1]=data[3]=0x00;
-    if(updownstop==1) data[1] = SEG_E | SEG_D | SEG_C;
-    else if(updownstop==2) data[1] = SEG_F | SEG_A | SEG_B;
-    data[2] = display->encodeDigit(andar+1);
+  void setData(CabinAction updownstop,int andar){
+    data[0]=data[1]=data[3]=0x00; //0
+    if(updownstop==CabinAction::S_TO_DOWN) data[1] = SEG_E | SEG_D | SEG_C;
+    else if(updownstop==CabinAction::S_TO_UP) data[1] = SEG_F | SEG_A | SEG_B;
+    data[2] = display->encodeDigit(andar+1); //0
   }
 
   void setAllDigits(int value=0xff){
