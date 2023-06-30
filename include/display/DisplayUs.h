@@ -3,15 +3,8 @@
 
 
 #include "Microservice.h"
+#include "DisplayState.h"
 #define QTSEGMENTOS 4
-
-enum class stateType : int
-{
-  wait_for_test = 0,
-  testing = 1,
-  set_display = 2,
-  noise = 3
-};
 
 class DisplayUs : public Microservice
 {
@@ -32,15 +25,12 @@ public:
     start      = 0;
     
     /*! Ajusta a saída de sinalização */
-    state = stateType::wait_for_test;
+    state = DisplayState::S_RESET;
     classActive = 1;
     logicActive = 1;
     startActive = 1;
     setActive ();
   }
-
-
-
 
   /*! --------------------------------------------------------------------------
    *  @brief      Executa o reset di microsserviço habilitado.
@@ -52,19 +42,12 @@ public:
     {
         
       mode = 0;
-      state = stateType::wait_for_test;
-      doMicroservice();
-      
+      andar = 0;
+      updownstop = CabinAction::S_STOPPED;
+      state = DisplayState::S_RESET;
     }
   }
 
-
-  /*! --------------------------------------------------------------------------
-   * @brief      Realiza a partida no serviço.
-   *
-   * @param[in]  fibo  -  1, Endereço do objeto do contador crescente.
-   * ---------------------------------------------------------------------------
-   */
   void setStart (int start)
   {
     if ((start >= 0) && (start <= 1))
@@ -94,20 +77,19 @@ public:
     {
       switch (state)
       {
-        case stateType::wait_for_test:
-            state = stateType::testing;
+        case DisplayState::S_RESET:
+            state = DisplayState::S_TEST;
             break;
-        case stateType::testing:
-            if(mode==1 || reset==1) state = stateType::set_display;
+        case DisplayState::S_TEST:
+            if(mode==1) state = DisplayState::S_SHOW;
             break;
-        case stateType::set_display:
-            mode=1;
+        case DisplayState::S_SHOW:
             break;
-        case stateType::noise:
-            state = stateType::wait_for_test;
+        case DisplayState::S_NOISE:
+            state = DisplayState::S_TEST;
             break;
         default:
-            state = stateType::wait_for_test;
+            state = DisplayState::S_TEST;
             break;
       }
     }
@@ -121,7 +103,7 @@ public:
    * ---------------------------------------------------------------------------
    */
   int getTesteOk(){
-      return (stateType::set_display)==state;
+      return (state = DisplayState::S_SHOW)==state;
   }
   
   int getActive ()
@@ -138,7 +120,7 @@ public:
       return andar;
   }
   
-  int getUpdownstop(){
+  CabinAction getUpdownstop(){
       return updownstop;
   }
   
@@ -158,7 +140,7 @@ public:
       DisplayUs::andar = andar;
   }
   
-  void setUpDownStop(int updownstop){
+  void setUpDownStop(CabinAction updownstop){
       DisplayUs::updownstop = updownstop;
   }
   
@@ -177,10 +159,10 @@ private:
   int             mode;
   int             reset;
   int             andar;
-  int             updownstop;
+  CabinAction     updownstop;
     
   /*! Controle do microsserviço */
-  stateType       state = stateType::wait_for_test;
+  DisplayState    state;
   int             start;
   int             classActive,
                   logicActive,

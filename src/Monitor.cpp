@@ -17,7 +17,7 @@
 #define MODULE_SIZE 90
 #define PIN_SG90 32
 #define PIN_CLK 17
-#define DIO_DISPLAY 16
+#define PIN_DIO 16
 
 Servo servo;
 
@@ -40,10 +40,6 @@ Monitor *Monitor::GetInstance()
         singleton_ = new Monitor();
     }
     return singleton_;
-}
-void Monitor::setupDisplay(){
-    displayBuilder = new DisplayBuilder();
-    displayBuilder->setEnable(1);
 }
 
 void Monitor::setupDoor() {
@@ -100,6 +96,20 @@ void Monitor::setupCommand() {
     commandUs->doResetMicroservice();
 }
 
+void Monitor::setupDisplay(){
+    displayBuilder = new DisplayBuilder();
+
+    displayBuilder->setEnable(1);
+    displayBuilder->buildDisplay(PIN_CLK,PIN_DIO);
+    displayBuilder->setupDisplay();
+
+    displayUs = new DisplayUs();
+    
+    displayUs->setEnable(1);
+
+    displayUs->doResetMicroservice();
+}
+
 void Monitor::doorLoop() {
     doorUs->doMicroservice();    
 
@@ -141,6 +151,12 @@ void Monitor::commandLoop() {
     prints();
 }
 
+void Monitor::displayLoop(){
+    displayUs->doMicroservice();
+
+    displayUs->setAndar(commandUs->getCurrentFloor());
+    displayUs->setUpDownStop(commandUs->getCabinAction());
+}
 void Monitor::prints() {
     Serial.print(bluetoothService->getBluetoothValue());
     Serial.print(",");
