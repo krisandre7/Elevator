@@ -10,6 +10,9 @@
 #include "CabinAction.h"
 #include "CommandState.h"
 
+#include "DisplayUs.h"
+#include "DisplayBuilder.h"
+
 #define BIT_SIZE 7
 #define MODULE_SIZE 90
 #define PIN_SG90 32
@@ -37,6 +40,10 @@ Monitor *Monitor::GetInstance()
         singleton_ = new Monitor();
     }
     return singleton_;
+}
+void Monitor::setupDisplay(){
+    displayBuilder = new DisplayBuilder();
+    displayBuilder->setEnable(1);
 }
 
 void Monitor::setupDoor() {
