@@ -71,7 +71,7 @@
  *            ++ cmp = fac.getCompare ();
  * -----------------------------------------------------------------------------
  */
-class DoorBuilder : public BlueetoothBuilder
+class DoorBuilder : public Builder
 {
 
 public:
