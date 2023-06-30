@@ -152,10 +152,19 @@ void Monitor::commandLoop() {
 }
 
 void Monitor::displayLoop(){
-    displayUs->doMicroservice();
 
     displayUs->setAndar(commandUs->getCurrentFloor());
     displayUs->setUpDownStop(commandUs->getCabinAction());
+
+    if(displayUs->getState()==DisplayState::S_TEST){
+        displayBuilder->setAllDigits();
+        displayBuilder->printDataDisplay();
+    }
+    if(displayUs->getState()==DisplayState::S_SHOW){
+        displayBuilder->setData(displayUs->getUpDownStop(),displayUs->getAndar());
+        displayBuilder->printDataDisplay();
+    }
+    displayUs->doMicroservice();
 }
 void Monitor::prints() {
     Serial.print(bluetoothService->getBluetoothValue());

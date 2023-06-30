@@ -109,9 +109,9 @@ public:
       return active;
   }
     
-  int getState () 
+  DisplayState getState () 
   {
-      return (int) state;
+      return state;
   }
   
   int getAndar(){
