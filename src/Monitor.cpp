@@ -7,6 +7,9 @@
 #include "CommandUs.h"
 #include "DoorUs.h"
 
+#include "CabinAction.h"
+#include "CommandState.h"
+
 #define BIT_SIZE 7
 #define MODULE_SIZE 90
 #define PIN_SG90 32
@@ -112,12 +115,12 @@ void Monitor::commandLoop() {
     }
 
     if (commandUs->getState() == CommandState::S_MOVE_CABIN) {
-        commandUs->setCabinState(bluetoothService->getBluetoothValue() > commandUs->getCurrentFloor()
-            ? CabinState::S_TO_UP : CabinState::S_TO_DOWN);
+        commandUs->setCabinAction(bluetoothService->getBluetoothValue() > commandUs->getCurrentFloor()
+            ? CabinAction::S_TO_UP : CabinAction::S_TO_DOWN);
     }
 
     if (commandUs->getState() == CommandState::S_WAIT_MOVING_CABIN) {
-        commandUs->setCabinState(CabinState::S_STOPPED);
+        commandUs->setCabinAction(CabinAction::S_STOPPED);
         commandUs->setCurrentFloor(bluetoothService->getBluetoothValue() - '0');
     }
 

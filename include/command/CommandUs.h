@@ -10,30 +10,9 @@
 #include "DoorUs.h"
 #include "Microservice.h"
 
-// Estados:
-enum class CommandState : int {
-    S_RESET,                 // Estado 00 (Reset)
-    S_WAIT_FOR_RESET,        // Estado 01 (Espera reset das historias terminar)
-    S_TEST_REQUEST,          // Estado 02 (Requisição de teste)
-    S_WAIT_FOR_TEST,         // Estado 03 (Espera fim de teste)
-    S_WAIT_FLOOR_REQUEST,    // Estado 04 (Espera requisição de andar)
-    S_SAVE_REQUESTED_FLOOR,  // Estado 05 (Salva requisição de andar)
-    S_MOVE_DOOR,             // Estado 06 (Fecha se estiver aberta e vice-versa)
-    S_CLOSE_DOOR,            // Estado 07 (Solicita fechamento da porta)
-    S_OPEN_DOOR,             // Estado 08 (Solicita abertura da porta)
-    S_WAIT_FINISH_DOOR,      // Estado 09 (Espera fim de movimento da porta)
-    S_MOVE_CABIN,            // Estado 10 (Solicita movimento da cabine)
-    S_WAIT_MOVING_CABIN,     // Estado 11 (A) (Espera movimento da cabine)
-    S_NOISE                  // Estado 12 (B) (Ruído)
-};
-
-// Estados da Cabine:
-enum class CabinState : int {
-    S_TO_UP,    // Estado 00 (Subindo)
-    S_TO_DOWN,  // Estado 01 (Descendo)
-    S_STOPPED,  // Estado 02 (Parado)
-    S_NOISE     // Estado 03 (Ruído)
-};
+#include "CabinAction.h"
+#include "CommandState.h"
+#include "DoorAction.h"
 
 class CommandUs : public Microservice {
    private:
@@ -55,8 +34,8 @@ class CommandUs : public Microservice {
     uint8_t currentFloor;   // Andar atual [0,2]
     DoorAction doorAction;  // Estado da porta (0 = fechada, 1 = em movimento, 2
                             // = aberta)
-    CabinState
-        cabinState;  // Estado da cabine (0 = subindo, 1 = descendo, 2 = parado)
+    CabinAction
+        cabinAction;  // Estado da cabine (0 = subindo, 1 = descendo, 2 = parado)
 
     /* Controle do microsserviço */
     CommandState state;  // Estado atual do microsserviço
@@ -85,7 +64,7 @@ class CommandUs : public Microservice {
         testIsRunning = false;
         currentFloor = 48;
         doorAction = DoorAction::ACT_NOISE;
-        cabinState = CabinState::S_NOISE;
+        cabinAction = CabinAction::S_NOISE;
 
         /*! Ajusta a saída de sinalização */
         state = CommandState::S_RESET;
@@ -288,14 +267,14 @@ class CommandUs : public Microservice {
                 case CommandState::S_MOVE_CABIN: {
                     startCabin = true;
 
-                    if (cabinState != CabinState::S_STOPPED)
+                    if (cabinAction != CabinAction::S_STOPPED)
                         state = CommandState::S_WAIT_MOVING_CABIN;
 
                     return;
                 }
 
                 case CommandState::S_WAIT_MOVING_CABIN: {
-                    if (cabinState == CabinState::S_STOPPED) {
+                    if (cabinAction == CabinAction::S_STOPPED) {
                         state = CommandState::S_OPEN_DOOR;
                         startCabin = false;
                     }
@@ -336,7 +315,7 @@ class CommandUs : public Microservice {
 
     void setDoorAction(DoorAction doorAction) { this->doorAction = doorAction; }
 
-    void setCabinState(CabinState cabinState) { this->cabinState = cabinState; }
+    void setCabinAction(CabinAction cabinAction) { this->cabinAction = cabinAction; }
 
     CommandState getState() { return this->state; }
 

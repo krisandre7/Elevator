@@ -1,30 +1,12 @@
+#pragma once
+
 #include <Arduino.h>
 #include "Microservice.h"
 #include "UpDownCounter.h"
-#pragma once
 
-enum class DoorState : int {
-  S_RESET = 0,
-  S_WAIT_4_START = 1,
-  S_SET_UP = 2,
-  S_COUNT_UP = 3,
-  S_SET_DOWN = 4,
-  S_COUNT_DOWN = 5,
-  S_NOISE = 6
-};
-
-//Estados da Porta:
-enum class DoorAction: int {
-  ACT_CLOSED_DOOR = 0, // Estado 00 (Porta fechada)
-  ACT_MOVING_DOOR,     // Estado 01 (Porta em movimento)
-  ACT_OPENED_DOOR,     // Estado 02 (Porta aberta)
-  ACT_NOISE            // Estado 03 (Ruído)
-};
-
-enum class DoorMode: int{
-  MODE_CLOSE_DOOR = 0,
-  MODE_OPEN_DOOR = 1
-};
+#include "DoorAction.h"
+#include "DoorState.h"
+#include "DoorMode.h"
 
 class DoorUs : public Microservice {
 
