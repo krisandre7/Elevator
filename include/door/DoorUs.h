@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "Microservice.h"
 #include "UpDownCounter.h"
+#pragma once
 
 enum class DoorState : int {
   S_RESET = 0,
@@ -30,11 +31,11 @@ class DoorUs : public Microservice {
 public:
   DoorUs() {
     /*! Configura as entradas do microsserviço */
-    start = 0;
+    doorStart = 0;
     upDownCounter = NULL;
-    doorMode = 0;
+    doorMode = DoorMode::MODE_CLOSE_DOOR;
     enable_in = 0;
-    reset_in = 0;
+    resetIn = 0;
 
     /*! Ajusta a saída de sinalização */
     state = DoorState::S_RESET;
@@ -56,6 +57,7 @@ public:
       /*! Ajusta asaída de sinalização */
       classActive = 1;
       logicActive = upDownCounter->getActive();
+      angle = upDownCounter->getQ();
     } else {
       /*! Ajusta asaída de sinalização */
       classActive = 0;
@@ -72,73 +74,11 @@ public:
     }
   }
 
-  void setStart(int start) {
-    if ((start >= 0) && (start <= 1)) {
-      /*! Guarda a entrada de controle. */
-      DoorUs::start = start;
-
-      /*! Ajusta a saída de sinalização. */
-      startActive = 1;
-    } else {
-      /*! Ajusta a saída de sinalização. */
-      startActive = 0;
-    }
-    setActive();
-  }
-
-  int get_out_reset(int reset, DoorState target, DoorState current) {
-    if (reset == 1) {
-      return 0;
-    } else {
-      if (current == target) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-  }
-
-  int get_out_count(int reset, DoorState current) {
-    if (reset == 1) {
-      return 0;
-    } else {
-      if (current == DoorState::S_COUNT_DOWN || current == DoorState::S_COUNT_UP) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-  }
-
-  int S_get_outet(int reset, DoorState current) {
-    if (reset == 1) {
-      return 0;
-    } else {
-      if (current == DoorState::S_SET_UP || current == DoorState::S_SET_DOWN) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-  }
-
-  countType get_out_up_down(int reset, DoorState current) {
-    if (reset) {
-      return countType::down;
-    } else {
-      if (current == DoorState::S_SET_UP || current == DoorState::S_COUNT_UP) {
-        return countType::up;
-      } else {
-        return countType::down;
-      }
-    }
-  }
-
-  DoorAction ACT_get_oution(int reset, DoorState current, int angle) {
-    if (reset == 1) {
+  DoorAction doAction() {
+    if (resetIn == 1) {
       // Modo limpa
       return DoorAction::ACT_CLOSED_DOOR;
-    } else if (current == DoorState::S_COUNT_UP || current == DoorState::S_COUNT_DOWN) {
+    } else if (state == DoorState::S_COUNT_UP || state == DoorState::S_COUNT_DOWN) {
       // Abrindo porta
       return DoorAction::ACT_MOVING_DOOR;
     } else if (angle == 0) {
@@ -159,24 +99,25 @@ public:
       switch (state) {
         case DoorState::S_RESET:
           upDownCounter->doResetQ();
+          upDownCounter->setCountMode(countType::down);
           state = DoorState::S_WAIT_4_START;
           break;
         case DoorState::S_WAIT_4_START:
-          if (start == 1 && doorMode == 0 && angle == 90) {
+          if (doorStart == 1 && doorMode == DoorMode::MODE_CLOSE_DOOR && angle == 90) {
             state = DoorState::S_SET_DOWN;
-          } else if (start == 1 && doorMode == 1 && angle == 0) {
+          } else if (doorStart == 1 && doorMode == DoorMode::MODE_OPEN_DOOR && angle == 0) {
             state = DoorState::S_SET_UP;
           }
           break;
         case DoorState::S_SET_UP:
-          if (DoorUs::start) DoorUs::start = 0;
+          if (DoorUs::doorStart) DoorUs::doorStart = 0;
 
           state = DoorState::S_COUNT_UP;
           upDownCounter->doResetQ();
           upDownCounter->setCountMode(countType::up);
           break;
         case DoorState::S_SET_DOWN:
-          if (DoorUs::start) DoorUs::start = 0;
+          if (DoorUs::doorStart) DoorUs::doorStart = 0;
 
           state = DoorState::S_COUNT_DOWN;
 
@@ -199,10 +140,7 @@ public:
           state = DoorState::S_NOISE;
       }
 
-      reset_in = get_out_reset(reset_in, DoorState::S_RESET, state);
-
-      action = ACT_get_oution(reset_in, state, angle);
-
+      action = doAction();
       angle = upDownCounter->getQ();
     }
   }
@@ -219,23 +157,21 @@ public:
     return angle;
   }
 
-  void setDoorMode(int value) {
-    doorMode = value;
+  DoorAction getDoorAction() {
+    return action;
   }
 
-  String getString() {
-    String stringState= String((int) state);
-    return stringState;
+  void setDoorStart(bool start) {
+    doorStart = start;
   }
 
-  void openDoor() {
-    setStart(1);
-    setDoorMode(1);
+
+  void setDoorMode(DoorMode mode) {
+    doorMode = mode;
   }
 
-  void closeDoor() {
-    setStart(1);
-    setDoorMode(0);
+  void setReset(int reset) {
+    resetIn = reset;
   }
 
 private:
@@ -248,14 +184,14 @@ private:
 
   /*! Entradas do microsserviço */
   UpDownCounter* upDownCounter;
-  bool doorMode;
+  DoorMode doorMode;
   int enable_in;
-  int reset_in;
+  int resetIn;
   int angle;
 
   /*! Controle do microsserviço */
   DoorState state;
-  int start;
+  bool doorStart;
   int classActive,
     logicActive,
     startActive;

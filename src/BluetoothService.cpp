@@ -8,6 +8,7 @@
 #define DEVICE_NAME "Elevador Squad 5"
 
 uint8_t blValue = '\0';
+bool oldValue = true;
 
 BluetoothService *BluetoothService::singleton_ = nullptr;
 
@@ -45,6 +46,8 @@ class Callback : public BLECharacteristicCallbacks {
         Serial.print("Comando recebido: ");
         Serial.println(number);
         blValue = number;
+
+        oldValue = false;
     }
 };
 
@@ -68,4 +71,9 @@ void BluetoothService::setupBluetooth() {
     Serial.println("Characteristic defined! Now you can read it in your phone!");
 }
 
-uint8_t BluetoothService::getBluetoothValue() { return blValue; }
+uint8_t BluetoothService::getBluetoothValue() { 
+    oldValue = true; 
+    return blValue; 
+}
+
+bool BluetoothService::isOldValue() { return oldValue; }

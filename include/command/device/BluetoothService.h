@@ -33,4 +33,6 @@ class BluetoothService {
     void setupBluetooth();
 
     uint8_t getBluetoothValue();
+
+    bool isOldValue();
 };
