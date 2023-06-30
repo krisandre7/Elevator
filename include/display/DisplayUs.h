@@ -5,6 +5,7 @@
 #include "Microservice.h"
 #include "DisplayState.h"
 #define QTSEGMENTOS 4
+#define DELAY_TEST 1000
 
 class DisplayUs : public Microservice
 {
@@ -18,7 +19,6 @@ public:
   DisplayUs ()
   {
     /*! Configura as entradas do microsserviço */
-    mode       = 0;
     reset      = 0;
     start      = 0;
     
@@ -38,8 +38,7 @@ public:
   {
     if ((enable == 1) && (active == 1))
     {
-        
-      mode = 0;
+      
       andar = 0;
       updownstop = CabinAction::S_STOPPED;
       state = DisplayState::S_RESET;
@@ -76,10 +75,12 @@ public:
       switch (state)
       {
         case DisplayState::S_RESET:
+            startTime = millis();
             state = DisplayState::S_TEST;
             break;
         case DisplayState::S_TEST:
-            if(mode==1) state = DisplayState::S_SHOW;
+            currentTime = millis();
+            if(currentTime-startTime>=DELAY_TEST) state = DisplayState::S_SHOW;
             break;
         case DisplayState::S_SHOW:
             break;
@@ -130,10 +131,6 @@ public:
       DisplayUs::reset = reset;
   }
   
-  void setMode(int mode){
-      DisplayUs::mode = mode;
-  }
-  
   void setAndar(int andar){
       DisplayUs::andar = andar;
   }
@@ -154,7 +151,6 @@ private:
   }
 
   /*! Entradas do microsserviço */
-  int             mode;
   int             reset;
   int             andar;
   CabinAction     updownstop;
@@ -165,7 +161,8 @@ private:
   int             classActive,
                   logicActive,
                   startActive;
-
+  int             startTime,
+                  currentTime;
   /*! Saída do microsserviço */
   int data[QTSEGMENTOS]={0xff,0xff,0xff,0xff};
 };
