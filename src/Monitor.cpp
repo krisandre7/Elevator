@@ -214,6 +214,7 @@ void Monitor::prints() {
 
     if(millis()-last < DELAY) return;
 
+    Serial.println("-------------");
     Serial.println("COMANDO");
     Serial.println("-------------");
     Serial.print("Dado: ");
@@ -225,6 +226,7 @@ void Monitor::prints() {
     Serial.print("Andar atual: ");
     Serial.println(commandUs->getCurrentFloor());
 
+    Serial.println("-------------");
     Serial.println("PORTA");
     Serial.println("-------------");
     Serial.print("Modo Porta: ");
@@ -238,7 +240,7 @@ void Monitor::prints() {
     Serial.print(",\n");
     Serial.print("Ação Porta: ");
     Serial.println(getString(doorUs->getAction()));
-    
+    Serial.println("-------------");
     Serial.println("CABINE");
     Serial.println("-------------");
     Serial.print("Estado Cabine: ");
