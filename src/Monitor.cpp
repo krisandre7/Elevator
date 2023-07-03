@@ -17,8 +17,8 @@
 #define BIT_SIZE 7
 #define MODULE_SIZE 90
 #define PIN_SG90 32
-#define PIN_DISPLAY_CLK 34
-#define PIN_DISPLAY_DIO 35
+#define PIN_DISPLAY_CLK 25
+#define PIN_DISPLAY_DIO 26
 
 Servo servo;
 
