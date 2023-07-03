@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 enum class CabinState : int {
   S_RESET,                  // Estado 00
@@ -10,3 +11,5 @@ enum class CabinState : int {
   WAIT_FOR_FINISH,          // Estado 06
   S_NOISE                   // Estado 07
 };
+
+String getString(CabinState enumVal);

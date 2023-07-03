@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 // Estados da Cabine que saem para o comando
 enum class CabinAction : int {
@@ -7,3 +8,5 @@ enum class CabinAction : int {
     S_STOPPED,  // Estado 02 (Parado)
     S_NOISE     // Estado 03 (Ruído)
 };
+
+String getString(CabinAction enumVal);

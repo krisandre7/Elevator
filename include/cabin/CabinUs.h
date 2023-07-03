@@ -11,6 +11,7 @@
 
 #include "CabinState.h"
 #include "CabinAction.h"
+#include "CabinMode.h"
 
 class CabinUs : public Microservice {
 
@@ -42,7 +43,7 @@ private:
   int isFinishedReset;
   CabinAction cabinAction;
   int startStepMotor;
-  bool clkwise;
+  CabinMode clkwise;
 
 public:
 
@@ -69,7 +70,7 @@ public:
     classActive = 1;
     logicActive = 1;
     startActive = 1;
-    clkwise = false;
+    clkwise = CabinMode::CLOCKWISE;
     setActive ();
   }
   /** --------------------------------------------------------------------------
@@ -241,14 +242,14 @@ public:
 
         //4
         case CabinState::MOVE_TO_UP: {
-          clkwise = 0;
+          clkwise = CabinMode::CLOCKWISE;
           cabinAction = CabinAction::S_TO_UP;
           state = CabinState::WAIT_FOR_FINISH;
           break;
         }
         //5
         case CabinState::MOVE_TO_DOWN: {
-          clkwise = 1;
+          clkwise = CabinMode::COUNTERCLOCKWISE;
           state = CabinState::WAIT_FOR_FINISH;
           cabinAction = CabinAction::S_TO_DOWN;
           break;
@@ -367,7 +368,7 @@ public:
 	  return this->startStepMotor;
   }
 
-  bool getClkwise() {
+  CabinMode getClkwise() {
       return clkwise;
   }
 };

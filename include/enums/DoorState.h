@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 enum class DoorState : int {
   S_RESET,
@@ -9,3 +10,5 @@ enum class DoorState : int {
   S_COUNT_DOWN,
   S_NOISE
 };
+
+String getString(DoorState enumVal);

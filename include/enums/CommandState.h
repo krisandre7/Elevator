@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 // Estado interno do Comando
 enum class CommandState : int {
@@ -16,3 +17,5 @@ enum class CommandState : int {
     S_WAIT_MOVING_CABIN,     // Estado 11 (A) (Espera movimento da cabine)
     S_NOISE                  // Estado 12 (B) (Ruído)
 };
+
+String getString(CommandState enumVal);

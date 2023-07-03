@@ -1,18 +1,22 @@
 #include "Monitor.h"
-#include "BluetoothService.h"
-
 #include <Arduino.h>
-#include <Servo.h>
 
 #include "CommandUs.h"
+#include "BluetoothService.h"
+
+
 #include "DoorUs.h"
+#include <Servo.h>
 
 #include "CabinAction.h"
 #include "CommandState.h"
 #include <Stepper.h>
+#include "CabinMode.h"
+#include "CabinState.h"
 
 #include "DisplayUs.h"
 #include "DisplayBuilder.h"
+#include "DisplayState.h"
 
 #define BIT_SIZE 7
 #define MODULE_SIZE 90
@@ -191,7 +195,7 @@ void Monitor::cabinLoop() {
     cabinUs->setRequestedFloor(commandUs->getRequestedFloor());
     cabinUs->setStartCabin(commandUs->getStartCabin());
 
-    stepper.step(cabinUs->getClkwise() ? cabinUs->getSteps() : -cabinUs->getSteps());
+    stepper.step(((int) cabinUs->getClkwise()) ? cabinUs->getSteps() : -cabinUs->getSteps());
 }
 
 void Monitor::displayLoop(){
@@ -216,7 +220,7 @@ void Monitor::prints() {
     Serial.print(bluetoothService->getBluetoothValue());
     Serial.print(",\n");
     Serial.print("Estado Comando: ");
-    Serial.print((int) commandUs->getState());
+    Serial.print(getString(commandUs->getState()));
     Serial.print(",\n");
     Serial.print("Andar atual: ");
     Serial.println(commandUs->getCurrentFloor());
@@ -224,33 +228,33 @@ void Monitor::prints() {
     Serial.println("PORTA");
     Serial.println("-------------");
     Serial.print("Modo Porta: ");
-    Serial.print((int) commandUs->getDoorMode());
+    Serial.print(getString(commandUs->getDoorMode()));
     Serial.print(",\n");
     Serial.print("Start Porta: ");
-    Serial.print((int) commandUs->getDoorStart());
+    Serial.print(commandUs->getDoorStart() ? "true" : "false");
     Serial.print(",\n");
     Serial.print("Angulo: ");
     Serial.print(doorUs->getAngle());
     Serial.print(",\n");
     Serial.print("Ação Porta: ");
-    Serial.println((int) doorUs->getAction());
+    Serial.println(getString(doorUs->getAction()));
     
     Serial.println("CABINE");
     Serial.println("-------------");
     Serial.print("Estado Cabine: ");
-    Serial.print((int) cabinUs->getState());
+    Serial.print(getString(cabinUs->getState()));
     Serial.print(",\n");
     Serial.print("Ação Cabine: ");
-    Serial.print((int) cabinUs->getCabinAction());
+    Serial.print(getString(cabinUs->getCabinAction()));
     Serial.print(",\n");
     Serial.print("Start Cabin: ");
-    Serial.print(cabinUs->getStartCabin());
+    Serial.print(cabinUs->getStartCabin() ? "true" : "false");
     Serial.print(",\n");
     Serial.print("Andar Req.: ");
     Serial.print(commandUs->getRequestedFloor());
     Serial.print(",\n");
     Serial.print("Clockwise: ");
-    Serial.println(cabinUs->getClkwise());
+    Serial.println(getString(cabinUs->getClkwise()));
 
     last = millis();
     // Serial.print(doorUs->getAngle());
