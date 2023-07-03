@@ -19,8 +19,11 @@
 #define PIN_SG90 32
 #define PIN_DISPLAY_CLK 25
 #define PIN_DISPLAY_DIO 26
+#define DELAY 1000
 
 Servo servo;
+
+unsigned long last =  millis();
 
 #define STEPS_PER_REVOLUTION 65 //NÚMERO DE PASSOS POR VOLTA
 #define STEPPER_SPEED 400
@@ -179,8 +182,6 @@ void Monitor::commandLoop() {
     // entradas da cabine
     commandUs->setCurrentFloor(cabinUs->getCurrentFloor());
     commandUs->setCabinAction(cabinUs->getCabinAction());
-
-    prints();
 }
 
 
@@ -206,19 +207,52 @@ void Monitor::displayLoop(){
     displayUs->doMicroservice();
 }
 void Monitor::prints() {
+
+    if(millis()-last < DELAY) return;
+
+    Serial.println("COMANDO");
+    Serial.println("-------------");
+    Serial.print("Dado: ");
     Serial.print(bluetoothService->getBluetoothValue());
-    Serial.print(",");
+    Serial.print(",\n");
+    Serial.print("Estado Comando: ");
     Serial.print((int) commandUs->getState());
-    Serial.print(",");
+    Serial.print(",\n");
+    Serial.print("Andar atual: ");
+    Serial.println(commandUs->getCurrentFloor());
+
+    Serial.println("PORTA");
+    Serial.println("-------------");
+    Serial.print("Modo Porta: ");
+    Serial.print((int) commandUs->getDoorMode());
+    Serial.print(",\n");
+    Serial.print("Start Porta: ");
+    Serial.print((int) commandUs->getDoorStart());
+    Serial.print(",\n");
+    Serial.print("Angulo: ");
+    Serial.print(doorUs->getAngle());
+    Serial.print(",\n");
+    Serial.print("Ação Porta: ");
+    Serial.println((int) doorUs->getAction());
+    
+    Serial.println("CABINE");
+    Serial.println("-------------");
+    Serial.print("Estado Cabine: ");
     Serial.print((int) cabinUs->getState());
-    Serial.print(",");
+    Serial.print(",\n");
+    Serial.print("Ação Cabine: ");
     Serial.print((int) cabinUs->getCabinAction());
-    Serial.print(",");
-    Serial.print(commandUs->getRequestedFloor());
-    Serial.print(",");
+    Serial.print(",\n");
+    Serial.print("Start Cabin: ");
     Serial.print(cabinUs->getStartCabin());
-    Serial.print(",");
+    Serial.print(",\n");
+    Serial.print("Andar Req.: ");
+    Serial.print(commandUs->getRequestedFloor());
+    Serial.print(",\n");
+    Serial.print("Clockwise: ");
     Serial.println(cabinUs->getClkwise());
+
+    last = millis();
     // Serial.print(doorUs->getAngle());
     // Serial.print(",");
     // Serial.print(commandUs->getCurrentFloor());

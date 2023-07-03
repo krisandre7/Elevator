@@ -26,5 +26,6 @@ void loop() {
     monitor->doorLoop();
     monitor->commandLoop();
     monitor->displayLoop();
+    monitor->prints();
     delay(50);
 }

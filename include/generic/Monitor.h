@@ -39,7 +39,6 @@ class Monitor {
     // Display
     DisplayBuilder *displayBuilder;
     DisplayUs *displayUs;
-    void prints();
 
    protected:
     Monitor();
@@ -69,4 +68,6 @@ class Monitor {
     void doorLoop();
     void cabinLoop();
     void displayLoop();
+
+    void prints();
 };
