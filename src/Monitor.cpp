@@ -3,7 +3,7 @@
 
 #include "CommandUs.h"
 #include "BluetoothService.h"
-
+#include "ButtonService.h"
 
 #include "DoorUs.h"
 #include <Servo.h>
@@ -35,23 +35,13 @@ Stepper stepper(STEPS_PER_REVOLUTION, 16, 18, 17, 19); //INICIALIZA O MOTOR
 
 Monitor* Monitor::singleton_= nullptr;
 
-Monitor::Monitor() {
-    BluetoothService *bluetoothService = BluetoothService::GetInstance();
-}
+Monitor::Monitor():
+  bluetoothService(BluetoothService::GetInstance()),
+  buttons(ButtonService::GetInstance()){ }
 
-/**
- * Static methods should be defined outside the class.
- */
-Monitor *Monitor::GetInstance()
-{
-    /**
-     * This is a safer way to create an instance. instance = new Monitor is
-     * dangeruous in case two instance threads wants to access at the same time
-     */
-    if(singleton_==nullptr){
-        singleton_ = new Monitor();
-    }
-    return singleton_;
+Monitor *Monitor::GetInstance(){
+  if(singleton_==nullptr) singleton_ = new Monitor();
+  return singleton_;
 }
 
 void Monitor::setupDoor() {
@@ -190,12 +180,22 @@ void Monitor::commandLoop() {
 
 
 void Monitor::cabinLoop() {
+    static bool toggleEnable = false, toggleClockwise = false;
+
     cabinUs->doMicroservice();
 
     cabinUs->setRequestedFloor(commandUs->getRequestedFloor());
     cabinUs->setStartCabin(commandUs->getStartCabin());
+    
+      // Serial.println("SOCORROOOOOOO");
 
-    stepper.step(((int) cabinUs->getClkwise()) ? cabinUs->getSteps() : -cabinUs->getSteps());
+    if(buttons->readButton(PinInButton::CABIN_EN_MOVE)) toggleEnable ^= 1;
+    if(buttons->readButton(PinInButton::CABIN_CLOCKWISE)) toggleClockwise ^= 1;
+
+    if(toggleEnable)
+      stepper.step(toggleClockwise ? 500 : -500);
+    else
+      stepper.step(((int) cabinUs->getClkwise()) ? cabinUs->getSteps() : -cabinUs->getSteps());
 }
 
 void Monitor::displayLoop(){
@@ -212,7 +212,7 @@ void Monitor::displayLoop(){
 }
 void Monitor::prints() {
 
-    if(millis()-last < DELAY) return;
+    // if(millis()-last < DELAY) return;
 
     Serial.println("-------------");
     Serial.println("COMANDO");
