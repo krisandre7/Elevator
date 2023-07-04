@@ -21,13 +21,7 @@ class BluetoothService {
     // Singletons should not be assignable.
     void operator=(const BluetoothService &) = delete;
 
-    /**
-     * This is the static method that controls the access to the
-     * bluetoothService instance. On the first run, it creates a
-     * bluetoothService object and places it into the static field. On
-     * subsequent runs, it returns the client existing object stored in the
-     * static field.
-     */
+    // Static singleton instance
     static BluetoothService *GetInstance();
 
     void setupBluetooth();
