@@ -183,12 +183,10 @@ public:
    */
   void setData (unsigned int data)
   {
-    Serial.printf("maximumData: %d, data: %d\n", maximumData, data);
     if (data <= maximumData)
 	{
 	  /*! Guarda a entrada data */
 	  Register::data = data;
-    Serial.println("PORRA");
 
 	  /*! Ajusta a saída de sinalização */
 	  dataActive = 1;

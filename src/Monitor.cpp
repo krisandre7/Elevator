@@ -28,9 +28,11 @@ Servo servo;
 unsigned long last =  millis();
 
 #define STEPS_PER_REVOLUTION 32 //NÚMERO DE PASSOS POR VOLTA
-#define STEPPER_SPEED 1200
-#define STEPPER_STEPS 10
-#define MAX_STEPPER_STEPS 50000
+#define CLOCKWISE_SPEED 1100
+#define COUNTERCLOCKWISE_SPEED 800
+#define STEPPER_STEPS 16
+#define STEPS_CLOCKWISE 320
+#define STEPS_COUNTERCLOCKWISE 245 // NÚMERO MÁXIMO DE PASSOS PARA UM ANDAR
 Stepper stepper(STEPS_PER_REVOLUTION, 16, 18, 17, 19); //INICIALIZA O MOTOR
 
 Monitor* Monitor::singleton_= nullptr;
@@ -129,7 +131,7 @@ void Monitor::setupCabin() {
 
     cabinBuilder->setupComparator();
     cabinBuilder->setupDataRegister();
-    cabinBuilder->setupDownCounter(MAX_STEPPER_STEPS);
+    cabinBuilder->setupDownCounter(STEPS_CLOCKWISE);
     
     cabinUs = new CabinUs();
 
@@ -144,7 +146,7 @@ void Monitor::setupCabin() {
     cabinUs->setEnable(true);
     cabinUs->doResetMicroservice();
 
-    stepper.setSpeed(STEPPER_SPEED);
+    stepper.setSpeed(CLOCKWISE_SPEED);
 }
 
 void Monitor::setupDisplay(){
@@ -162,6 +164,8 @@ void Monitor::setupDisplay(){
 }
 
 void Monitor::doorLoop() {
+    static int lastTime=0;
+    int curTime = millis();
     doorUs->doMicroservice();    
 
     // entradas
@@ -170,7 +174,9 @@ void Monitor::doorLoop() {
     doorUs->setReset(commandUs->getReset());
 
     // saída device
+    // if(curTime-lastTime<1000) return;
     servo.write(doorUs->getAngle());
+    // lastTime=curTime;
 }
 
 void Monitor::commandLoop() {
@@ -203,13 +209,20 @@ void Monitor::cabinLoop() {
     if(buttons->readButton(PinInButton::CABIN_EN_MOVE)) toggleEnable ^= 1;
     if(buttons->readButton(PinInButton::CABIN_CLOCKWISE)) toggleClockwise ^= 1;
 
+    if (cabinUs->getCabinState() == CabinState::MOVE_TO_UP || (toggleEnable && toggleClockwise)) {
+        stepper.setSpeed(CLOCKWISE_SPEED);
+        cabinUs->setCountModule(STEPS_CLOCKWISE);
+    }
+    else if (cabinUs->getCabinState() == CabinState::MOVE_TO_DOWN || (toggleEnable && !toggleClockwise)) {
+        stepper.setSpeed(COUNTERCLOCKWISE_SPEED);
+        cabinUs->setCountModule(STEPS_COUNTERCLOCKWISE);
+    }
+
     if(toggleEnable)
       stepper.step(toggleClockwise ? INT_MAX : INT_MIN, true);
     else {
-        // Serial.println("Steps" + String(cabinUs->getQ()));
-        if (cabinUs->getCabinAction() == CabinAction::S_TO_UP || cabinUs->getCabinAction() == CabinAction::S_TO_DOWN) {
-            // Serial.println("SOCOROOOOOO");
-            stepper.step(((int) cabinUs->getClkwise()) ? STEPPER_STEPS : -STEPPER_STEPS);
+        if (cabinUs->getCabinState() == CabinState::WAIT_FOR_FINISH) {
+            stepper.step(cabinUs->isClockwise() ? STEPPER_STEPS: -STEPPER_STEPS);
         }
     }
 }

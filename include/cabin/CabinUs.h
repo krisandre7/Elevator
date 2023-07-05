@@ -114,7 +114,8 @@ public:
 
       // Ajusta a saída de sinalização
       classActive = 1;
-      dc->setCountModule(STEPS_TO_FLOOR+1);
+      // dc->setCountModule(1);
+      dc->doSetQ();
       logicActive = dc->getActive();
     } else {
       // Ajusta asaída de sinalização
@@ -222,8 +223,6 @@ public:
 
             dc->doSetQ();
             nSteps = dc->getQ();
-
-            Serial.printf("SANS: %d", nSteps);
 
           if ( cmp->getGreatestThenOut() ) {
             state = CabinState::MOVE_TO_UP;
@@ -349,8 +348,21 @@ public:
 	  return this->startStepMotor;
   }
 
+  CabinState getCabinState() {
+    return state;
+  }
+
   CabinMode getClkwise() {
       return clkwise;
+  }
+
+  bool isClockwise() {
+    return clkwise == CabinMode::CLOCKWISE;
+  }
+
+  void setCountModule(int countModule) {
+      dc->setCountModule(countModule);
+      dc->doSetQ();
   }
 
   int getQ() {

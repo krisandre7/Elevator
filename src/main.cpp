@@ -8,7 +8,7 @@ Monitor *monitor;
 bool active;
 
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(9600);
     esp_log_level_set("*", ESP_LOG_VERBOSE);
     monitor = Monitor::GetInstance();
     monitor->setupCommand();
@@ -26,5 +26,5 @@ void loop() {
     monitor->doorLoop();
     monitor->commandLoop();
     monitor->displayLoop();
-    monitor->prints();
+    // monitor->prints();
 }
