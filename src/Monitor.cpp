@@ -124,6 +124,11 @@ void Monitor::setupCabin() {
     cabinBuilder->buildComparator();
     cabinBuilder->buildDataRegister();
     cabinBuilder->buildDownCounter();
+
+    cabinBuilder->setupDownCounter(7);
+    cabinBuilder->setupComparator();
+    cabinBuilder->setupDataRegister();
+    cabinBuilder->setupCompare(2);
     
     cabinUs = new CabinUs();
 
