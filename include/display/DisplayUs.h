@@ -16,7 +16,8 @@ public:
    *  @brief      Configuração inicial do serviço.
    *  --------------------------------------------------------------------------
    */
-  DisplayUs ()
+  DisplayUs (DisplayDevice *displayDev)
+    :displayDev(displayDev)
   {
     /*! Configura as entradas do microsserviço */
     reset      = 0;
@@ -79,10 +80,14 @@ public:
             state = DisplayState::S_TEST;
             break;
         case DisplayState::S_TEST:
+            displayDev->setAllDigits();
+            displayDev->printDataDisplay();
             currentTime = millis();
             if(currentTime-startTime>=DELAY_TEST) state = DisplayState::S_SHOW;
             break;
         case DisplayState::S_SHOW:
+            displayDev->setData(updownstop, andar);
+            displayDev->printDataDisplay();
             break;
         case DisplayState::S_NOISE:
             state = DisplayState::S_TEST;
@@ -163,6 +168,9 @@ private:
                   startActive;
   int             startTime,
                   currentTime;
+
+  DisplayDevice *displayDev;
+
   /*! Saída do microsserviço */
   int data[QTSEGMENTOS]={0xff,0xff,0xff,0xff};
 };

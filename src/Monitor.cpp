@@ -21,8 +21,6 @@
 #define BIT_SIZE 7
 #define MODULE_SIZE 90
 #define PIN_SG90 32
-#define PIN_DISPLAY_CLK 25
-#define PIN_DISPLAY_DIO 26
 #define DELAY 1000
 
 Servo servo;
@@ -150,7 +148,7 @@ void Monitor::setupDisplay(){
     displayBuilder->buildDisplay(PIN_DISPLAY_CLK, PIN_DISPLAY_DIO);
     displayBuilder->setupDisplay();
 
-    displayUs = new DisplayUs();
+    displayUs = new DisplayUs(displayBuilder->getDisplay());
     
     displayUs->setEnable(1);
 
@@ -180,16 +178,6 @@ void Monitor::commandLoop() {
         commandUs->setTestIsRunning(false);
     }
 
-    // if (commandUs->getState() == CommandState::S_MOVE_CABIN) {
-    //     commandUs->setCabinAction(bluetoothService->getBluetoothValue() > commandUs->getCurrentFloor()
-    //         ? CabinAction::S_TO_UP : CabinAction::S_TO_DOWN);
-    // }
-
-    // if (commandUs->getState() == CommandState::S_WAIT_MOVING_CABIN) {
-    //     commandUs->setCabinAction(CabinAction::S_STOPPED);
-    //     commandUs->setCurrentFloor(bluetoothService->getBluetoothValue() - '0');
-    // }
-
     // entradas da porta (a pedido do Fernando)
     commandUs->setDoorAction(doorUs->getAction());
     commandUs->setIsOldValue(bluetoothService->isOldValue());
@@ -217,14 +205,18 @@ void Monitor::cabinLoop() {
 
 void Monitor::displayLoop(){
 
-    if(displayUs->getState()==DisplayState::S_TEST){
-        displayBuilder->setAllDigits();
-        displayBuilder->printDataDisplay();
-    }
-    if(displayUs->getState()==DisplayState::S_SHOW){
-        displayBuilder->setData(commandUs->getCabinAction(),commandUs->getCurrentFloor());
-        displayBuilder->printDataDisplay();
-    }
+    // if(displayUs->getState()==DisplayState::S_TEST){
+    //     displayBuilder->setAllDigits();
+    //     displayBuilder->printDataDisplay();
+    // }
+    // if(displayUs->getState()==DisplayState::S_SHOW){
+    //     displayBuilder->setData(commandUs->getCabinAction(),commandUs->getCurrentFloor());
+    //     displayBuilder->printDataDisplay();
+    // }
+
+    displayUs->setAndar(commandUs->getCurrentFloor());
+    displayUs->setUpDownStop(commandUs->getCabinAction());
+
     displayUs->doMicroservice();
 }
 void Monitor::prints() {
@@ -268,6 +260,9 @@ void Monitor::prints() {
     Serial.print(",\n");
     Serial.print("Start Cabin: ");
     Serial.print(cabinUs->getStartCabin() ? "true" : "false");
+    Serial.print(",\n");
+    Serial.print("Andar Atual: ");
+    Serial.print(commandUs->getCurrentFloor());
     Serial.print(",\n");
     Serial.print("Andar Req.: ");
     Serial.print(commandUs->getRequestedFloor());

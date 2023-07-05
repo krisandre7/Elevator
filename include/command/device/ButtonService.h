@@ -4,7 +4,7 @@
 #include <Button.h>
 
 enum class PinInButton : uint8_t{
-  RESET = 2,
+  RESET = 16,
   CABIN_EN_MOVE = 0,
   CABIN_CLOCKWISE = 4
 };
