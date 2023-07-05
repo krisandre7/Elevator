@@ -31,7 +31,7 @@ class CommandUs : public Microservice {
                           // em execução)
     bool testIsRunning;  // Flag de teste em execução (1 = em execução, 0 = não
                          // em execução)
-    uint8_t currentFloor;   // Andar atual [0,2]
+    uint8_t currentFloor;   // Andar atual [1,3]
     DoorAction doorAction;  // Estado da porta (0 = fechada, 1 = em movimento, 2
                             // = aberta)
     CabinAction
@@ -62,7 +62,7 @@ class CommandUs : public Microservice {
         bluetoothData = '\0';
         doorMode = DoorMode::MODE_CLOSE_DOOR;
         testIsRunning = false;
-        currentFloor = 48;
+        currentFloor = 1;
         doorAction = DoorAction::ACT_NOISE;
         cabinAction = CabinAction::S_NOISE;
 
@@ -176,7 +176,7 @@ class CommandUs : public Microservice {
                 case CommandState::S_WAIT_FLOOR_REQUEST: {
                     // Serial.print("Ó o dado: ");
                     // Serial.println(bluetoothData);
-                    if (!isOldValue && bluetoothData >= '0' && bluetoothData <= '2')
+                    if (!isOldValue && bluetoothData >= '1' && bluetoothData <= '3')
                         state = CommandState::S_SAVE_REQUESTED_FLOOR;
                     return;
                 }
@@ -211,7 +211,7 @@ class CommandUs : public Microservice {
                         }
                     } else
                         state = CommandState::S_NOISE;
-
+  
                     return;
                 }
 

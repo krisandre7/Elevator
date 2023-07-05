@@ -10,6 +10,9 @@
 uint8_t blValue = '\0';
 bool oldValue = true;
 
+#define FLOOR_MIN 1
+#define FLOOR_MAX 3
+
 BluetoothService *BluetoothService::singleton_ = nullptr;
 
 BluetoothService::BluetoothService()
@@ -28,7 +31,7 @@ class Callback : public BLECharacteristicCallbacks {
         std::string value = pCharacteristic->getValue();
         uint8_t number = '0' + value[0];
 
-        if (value.length() != 1 || number < '0' || number > '2') {
+        if (value.length() != 1 || number < ('0'+FLOOR_MIN) || number > ('0'+FLOOR_MAX)) {
             Serial.println("Comando invalido >:]");
             return;
         }

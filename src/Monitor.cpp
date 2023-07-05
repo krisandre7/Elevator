@@ -178,16 +178,6 @@ void Monitor::commandLoop() {
         commandUs->setTestIsRunning(false);
     }
 
-    // if (commandUs->getState() == CommandState::S_MOVE_CABIN) {
-    //     commandUs->setCabinAction(bluetoothService->getBluetoothValue() > commandUs->getCurrentFloor()
-    //         ? CabinAction::S_TO_UP : CabinAction::S_TO_DOWN);
-    // }
-
-    // if (commandUs->getState() == CommandState::S_WAIT_MOVING_CABIN) {
-    //     commandUs->setCabinAction(CabinAction::S_STOPPED);
-    //     commandUs->setCurrentFloor(bluetoothService->getBluetoothValue() - '0');
-    // }
-
     // entradas da porta (a pedido do Fernando)
     commandUs->setDoorAction(doorUs->getAction());
     commandUs->setIsOldValue(bluetoothService->isOldValue());
@@ -270,6 +260,9 @@ void Monitor::prints() {
     Serial.print(",\n");
     Serial.print("Start Cabin: ");
     Serial.print(cabinUs->getStartCabin() ? "true" : "false");
+    Serial.print(",\n");
+    Serial.print("Andar Atual: ");
+    Serial.print(commandUs->getCurrentFloor());
     Serial.print(",\n");
     Serial.print("Andar Req.: ");
     Serial.print(commandUs->getRequestedFloor());

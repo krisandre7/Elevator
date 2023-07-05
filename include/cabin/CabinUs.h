@@ -1,6 +1,7 @@
 #ifndef CABIN_MICROSSERVICE_H_
 #define CABIN_MICROSSERVICE_H_
 
+#include <Arduino.h>
 #include <string>
 #include <stdbool.h>
 
@@ -39,7 +40,7 @@ private:
                   startActive;
 
   /* Saída do microsserviço */
-  unsigned int currentFloor = 0;
+  unsigned int currentFloor = 1;
   int isFinishedReset;
   CabinAction cabinAction;
   int startStepMotor;
@@ -165,10 +166,6 @@ public:
     }
   }
 
-  void setCurrentFloor(unsigned int currentFloor) {
-    this->currentFloor = currentFloor;
-  }
-
   void setRequestedFloor(unsigned int requestedFloor){
 	  if ( isFinishedReset ) this->requestedFloor = requestedFloor;
   }
@@ -195,7 +192,7 @@ public:
         }
         //1
         case CabinState::S_WAIT_FOR_RESET: {
-          requestedFloor = 0; //bluetooth manda p nois.
+          requestedFloor = 1; //bluetooth manda p nois.
           state = CabinState::MOVE_CABIN;
           break;
         }
@@ -285,6 +282,8 @@ public:
             }
 
             else if ( cabinAction == CabinAction::S_TO_DOWN and nSteps == 0 ) {
+
+              // Serial.println("SOCORRO");
                 currentFloor--;
                 reg->setData(currentFloor);
                 reg->setLoadEnable(1);
