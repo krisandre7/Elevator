@@ -187,8 +187,6 @@ void Monitor::cabinLoop() {
     cabinUs->setRequestedFloor(commandUs->getRequestedFloor());
     cabinUs->setStartCabin(commandUs->getStartCabin());
     
-      // Serial.println("SOCORROOOOOOO");
-
     if(buttons->readButton(PinInButton::CABIN_EN_MOVE)) toggleEnable ^= 1;
     if(buttons->readButton(PinInButton::CABIN_CLOCKWISE)) toggleClockwise ^= 1;
 
@@ -212,7 +210,7 @@ void Monitor::displayLoop(){
 }
 void Monitor::prints() {
 
-    // if(millis()-last < DELAY) return;
+    if(millis()-last < DELAY) return;
 
     Serial.println("-------------");
     Serial.println("COMANDO");
