@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 /*! ****************************************************************************
  * @copyright   Miguel Grimm <miguelgrimm@gmail>
  *
@@ -181,6 +183,7 @@ public:
    */
   void setData (unsigned int data)
   {
+    Serial.printf("maximumData: %d, data: %d\n", maximumData, data);
     if (data <= maximumData)
 	{
 	  /*! Guarda a entrada data */

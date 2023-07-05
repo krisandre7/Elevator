@@ -14,6 +14,8 @@
 #include "CabinAction.h"
 #include "CabinMode.h"
 
+#define STEPS_TO_FLOOR 15000
+
 class CabinUs : public Microservice {
 
 private:
@@ -215,8 +217,12 @@ public:
             cmp->setGreastLessEqualIn(1);
             cmp->doArithmetic();
 
-            dc->doSetQ();
+            int floorDistance = abs((int) (requestedFloor - currentFloor));
 
+            dc->setData(STEPS_TO_FLOOR);
+            nSteps = dc->getQ();
+
+            Serial.printf("SANS: %d", nSteps);
 
           if ( cmp->getGreatestThenOut() ) {
             state = CabinState::MOVE_TO_UP;
@@ -274,7 +280,7 @@ public:
                     state = CabinState::MOVE_CABIN;
                     return;
                 } else {
-                    dc->doSetQ();
+                    dc->setData(STEPS_TO_FLOOR);
                     return;
                 }
 
@@ -299,7 +305,7 @@ public:
                     state = CabinState::MOVE_CABIN;
                     return;
                 } else {
-                    dc->doSetQ();
+                    dc->setData(STEPS_TO_FLOOR);
                     return;
                 }
 
@@ -369,6 +375,10 @@ public:
 
   CabinMode getClkwise() {
       return clkwise;
+  }
+
+  int getQ() {
+      return dc->getQ();
   }
 };
 

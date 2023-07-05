@@ -27,8 +27,10 @@ Servo servo;
 
 unsigned long last =  millis();
 
-#define STEPS_PER_REVOLUTION 65 //NÚMERO DE PASSOS POR VOLTA
-#define STEPPER_SPEED 400
+#define STEPS_PER_REVOLUTION 32 //NÚMERO DE PASSOS POR VOLTA
+#define STEPPER_SPEED 1200
+#define STEPPER_STEPS 2
+#define MAX_STEPPER_STEPS 50000
 Stepper stepper(STEPS_PER_REVOLUTION, 16, 18, 17, 19); //INICIALIZA O MOTOR
 
 Monitor* Monitor::singleton_= nullptr;
@@ -125,10 +127,9 @@ void Monitor::setupCabin() {
     cabinBuilder->buildDataRegister();
     cabinBuilder->buildDownCounter();
 
-    cabinBuilder->setupDownCounter(7);
     cabinBuilder->setupComparator();
     cabinBuilder->setupDataRegister();
-    cabinBuilder->setupCompare(2);
+    cabinBuilder->setupDownCounter(MAX_STEPPER_STEPS);
     
     cabinUs = new CabinUs();
 
@@ -204,8 +205,13 @@ void Monitor::cabinLoop() {
 
     if(toggleEnable)
       stepper.step(toggleClockwise ? INT_MAX : INT_MIN, true);
-    else
-      stepper.step(((int) cabinUs->getClkwise()) ? cabinUs->getSteps() : -cabinUs->getSteps());
+    else {
+        // Serial.println("Steps" + String(cabinUs->getQ()));
+        if (cabinUs->getQ() > 0) {
+            // Serial.println("SOCOROOOOOO");
+            stepper.step(((int) cabinUs->getClkwise()) ? STEPPER_STEPS : -STEPPER_STEPS);
+        }
+    }
 }
 
 void Monitor::displayLoop(){

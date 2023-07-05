@@ -27,5 +27,4 @@ void loop() {
     monitor->commandLoop();
     monitor->displayLoop();
     monitor->prints();
-    delay(50);
 }
