@@ -174,10 +174,7 @@ class CommandUs : public Microservice {
                 }
 
                 case CommandState::S_WAIT_FLOOR_REQUEST: {
-                    // Serial.print("Ó o dado: ");
-                    // Serial.println(bluetoothData);
-                    if (!isOldValue && bluetoothData >= '1' && bluetoothData <= '3')
-                        state = CommandState::S_SAVE_REQUESTED_FLOOR;
+                    if (!isOldValue) state = CommandState::S_SAVE_REQUESTED_FLOOR;
                     return;
                 }
 
@@ -205,12 +202,9 @@ class CommandUs : public Microservice {
                                 state = CommandState::S_MOVE_DOOR;
                             else
                                 state = CommandState::S_WAIT_FLOOR_REQUEST;
-                            //     state = CommandState::S_MOVE_CABIN;
-                            // else
-                                // state = CommandState::S_MOVE_DOOR;
                         }
-                    } else
-                        state = CommandState::S_NOISE;
+                    }
+                    else state = CommandState::S_NOISE;
   
                     return;
                 }

@@ -14,7 +14,7 @@
 #include "CabinAction.h"
 #include "CabinMode.h"
 
-#define STEPS_TO_FLOOR 15000
+#define STEPS_TO_FLOOR 300
 
 class CabinUs : public Microservice {
 
@@ -114,6 +114,7 @@ public:
 
       // Ajusta a saída de sinalização
       classActive = 1;
+      dc->setCountModule(STEPS_TO_FLOOR+1);
       logicActive = dc->getActive();
     } else {
       // Ajusta asaída de sinalização
@@ -219,7 +220,7 @@ public:
 
             int floorDistance = abs((int) (requestedFloor - currentFloor));
 
-            dc->setData(STEPS_TO_FLOOR);
+            dc->doSetQ();
             nSteps = dc->getQ();
 
             Serial.printf("SANS: %d", nSteps);
@@ -264,52 +265,27 @@ public:
             startStepMotor = true;
 
 
-            if ( cabinAction == CabinAction::S_TO_UP and nSteps == 0 ) {
-                currentFloor++;
-                reg->setData(currentFloor);
-                reg->setLoadEnable(1);
-                reg->doRegister();
-                cmp->setDataA(requestedFloor);
-                cmp->setDataB(currentFloor);
-                cmp->setGreastLessEqualIn(1);
-                cmp->doArithmetic();
+            if(nSteps == 0){
+              if(cabinAction == CabinAction::S_TO_UP) currentFloor++;
+              else currentFloor--;
 
-                if ( cmp->getEqualOut() ) {
-                    dc->setCountEnable(false);
-                    cabinAction = CabinAction::S_STOPPED;
-                    state = CabinState::MOVE_CABIN;
-                    return;
-                } else {
-                    dc->setData(STEPS_TO_FLOOR);
-                    return;
-                }
+              reg->setData(currentFloor);
+              reg->setLoadEnable(1);
+              reg->doRegister();
+              cmp->setDataA(requestedFloor);
+              cmp->setDataB(currentFloor);
+              cmp->setGreastLessEqualIn(1);
+              cmp->doArithmetic();
 
-
-            }
-
-            else if ( cabinAction == CabinAction::S_TO_DOWN and nSteps == 0 ) {
-
-              // Serial.println("SOCORRO");
-                currentFloor--;
-                reg->setData(currentFloor);
-                reg->setLoadEnable(1);
-                reg->doRegister();
-                cmp->setDataA(requestedFloor);
-                cmp->setDataB(currentFloor);
-                cmp->setGreastLessEqualIn(1);
-                cmp->doArithmetic();
-
-                if ( cmp->getEqualOut() ) {
-                    dc->setCountEnable(false);
-                    cabinAction = CabinAction::S_STOPPED;
-                    state = CabinState::MOVE_CABIN;
-                    return;
-                } else {
-                    dc->setData(STEPS_TO_FLOOR);
-                    return;
-                }
-
-
+              if ( cmp->getEqualOut() ) {
+                  dc->setCountEnable(false);
+                  cabinAction = CabinAction::S_STOPPED;
+                  state = CabinState::MOVE_CABIN;
+                  return;
+              } else {
+                  dc->doSetQ();
+                  return;
+              }
             }
 
             else {

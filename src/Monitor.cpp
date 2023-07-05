@@ -29,7 +29,7 @@ unsigned long last =  millis();
 
 #define STEPS_PER_REVOLUTION 32 //NÚMERO DE PASSOS POR VOLTA
 #define STEPPER_SPEED 1200
-#define STEPPER_STEPS 2
+#define STEPPER_STEPS 10
 #define MAX_STEPPER_STEPS 50000
 Stepper stepper(STEPS_PER_REVOLUTION, 16, 18, 17, 19); //INICIALIZA O MOTOR
 
@@ -207,7 +207,7 @@ void Monitor::cabinLoop() {
       stepper.step(toggleClockwise ? INT_MAX : INT_MIN, true);
     else {
         // Serial.println("Steps" + String(cabinUs->getQ()));
-        if (cabinUs->getQ() > 0) {
+        if (cabinUs->getCabinAction() == CabinAction::S_TO_UP || cabinUs->getCabinAction() == CabinAction::S_TO_DOWN) {
             // Serial.println("SOCOROOOOOO");
             stepper.step(((int) cabinUs->getClkwise()) ? STEPPER_STEPS : -STEPPER_STEPS);
         }
@@ -215,16 +215,6 @@ void Monitor::cabinLoop() {
 }
 
 void Monitor::displayLoop(){
-
-    // if(displayUs->getState()==DisplayState::S_TEST){
-    //     displayBuilder->setAllDigits();
-    //     displayBuilder->printDataDisplay();
-    // }
-    // if(displayUs->getState()==DisplayState::S_SHOW){
-    //     displayBuilder->setData(commandUs->getCabinAction(),commandUs->getCurrentFloor());
-    //     displayBuilder->printDataDisplay();
-    // }
-
     displayUs->setAndar(commandUs->getCurrentFloor());
     displayUs->setUpDownStop(commandUs->getCabinAction());
 

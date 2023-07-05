@@ -188,6 +188,7 @@ public:
 	{
 	  /*! Guarda a entrada data */
 	  Register::data = data;
+    Serial.println("PORRA");
 
 	  /*! Ajusta a saída de sinalização */
 	  dataActive = 1;
