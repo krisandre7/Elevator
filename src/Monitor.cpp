@@ -10,7 +10,7 @@
 
 #include "CabinAction.h"
 #include "CommandState.h"
-#include <Stepper.h>
+#include "Stepper.h"
 #include "CabinMode.h"
 #include "CabinState.h"
 
@@ -35,9 +35,31 @@ Stepper stepper(STEPS_PER_REVOLUTION, 16, 18, 17, 19); //INICIALIZA O MOTOR
 
 Monitor* Monitor::singleton_= nullptr;
 
+static bool toggleEnable = false, toggleClockwise = false;
+
+#define BTN_TOUCH_DELAY 200
+
+void toggleRiseCabinEn(){
+  static long lastEvent = 0;
+  long cur = millis();
+  if(cur - lastEvent >= BTN_TOUCH_DELAY) stepper.cabinEn =  (toggleEnable^=1);
+  
+  lastEvent = cur;
+}
+
+void toggleRiseClkwise(){
+  static long lastEvent = 0;
+  long cur = millis();
+  if(cur - lastEvent >= BTN_TOUCH_DELAY) stepper.cabinClk = (toggleClockwise^=1);
+  lastEvent = cur;
+}
+
 Monitor::Monitor():
   bluetoothService(BluetoothService::GetInstance()),
-  buttons(ButtonService::GetInstance()){ }
+  buttons(ButtonService::GetInstance()){
+    attachInterrupt((uint8_t) PinInButton::CABIN_EN_MOVE, toggleRiseCabinEn, FALLING);
+    attachInterrupt((uint8_t) PinInButton::CABIN_CLOCKWISE, toggleRiseClkwise, FALLING);
+  }
 
 Monitor *Monitor::GetInstance(){
   if(singleton_==nullptr) singleton_ = new Monitor();
@@ -178,22 +200,14 @@ void Monitor::commandLoop() {
     commandUs->setCabinAction(cabinUs->getCabinAction());
 }
 
-
 void Monitor::cabinLoop() {
-    static bool toggleEnable = false, toggleClockwise = false;
-
     cabinUs->doMicroservice();
 
     cabinUs->setRequestedFloor(commandUs->getRequestedFloor());
     cabinUs->setStartCabin(commandUs->getStartCabin());
-    
-      // Serial.println("SOCORROOOOOOO");
-
-    if(buttons->readButton(PinInButton::CABIN_EN_MOVE)) toggleEnable ^= 1;
-    if(buttons->readButton(PinInButton::CABIN_CLOCKWISE)) toggleClockwise ^= 1;
 
     if(toggleEnable)
-      stepper.step(toggleClockwise ? 500 : -500);
+      stepper.step(toggleClockwise ? INT_MAX : INT_MIN, true);
     else
       stepper.step(((int) cabinUs->getClkwise()) ? cabinUs->getSteps() : -cabinUs->getSteps());
 }
