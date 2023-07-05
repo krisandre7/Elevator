@@ -21,8 +21,6 @@
 #define BIT_SIZE 7
 #define MODULE_SIZE 90
 #define PIN_SG90 32
-#define PIN_DISPLAY_CLK 25
-#define PIN_DISPLAY_DIO 26
 #define DELAY 1000
 
 Servo servo;
@@ -150,7 +148,7 @@ void Monitor::setupDisplay(){
     displayBuilder->buildDisplay(PIN_DISPLAY_CLK, PIN_DISPLAY_DIO);
     displayBuilder->setupDisplay();
 
-    displayUs = new DisplayUs();
+    displayUs = new DisplayUs(displayBuilder->getDisplay());
     
     displayUs->setEnable(1);
 
@@ -217,14 +215,18 @@ void Monitor::cabinLoop() {
 
 void Monitor::displayLoop(){
 
-    if(displayUs->getState()==DisplayState::S_TEST){
-        displayBuilder->setAllDigits();
-        displayBuilder->printDataDisplay();
-    }
-    if(displayUs->getState()==DisplayState::S_SHOW){
-        displayBuilder->setData(commandUs->getCabinAction(),commandUs->getCurrentFloor());
-        displayBuilder->printDataDisplay();
-    }
+    // if(displayUs->getState()==DisplayState::S_TEST){
+    //     displayBuilder->setAllDigits();
+    //     displayBuilder->printDataDisplay();
+    // }
+    // if(displayUs->getState()==DisplayState::S_SHOW){
+    //     displayBuilder->setData(commandUs->getCabinAction(),commandUs->getCurrentFloor());
+    //     displayBuilder->printDataDisplay();
+    // }
+
+    displayUs->setAndar(commandUs->getCurrentFloor());
+    displayUs->setUpDownStop(commandUs->getCabinAction());
+
     displayUs->doMicroservice();
 }
 void Monitor::prints() {
