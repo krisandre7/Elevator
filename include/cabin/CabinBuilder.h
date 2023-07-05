@@ -90,7 +90,7 @@ public:
     if ( enable == true ) {
 	    if ( dc == nullptr ) {
 	      // Cria o objeto dinamicamente
-	      dc = new DownCounter (4);
+	      dc = new DownCounter (20);
 	      newActive = 1;
 	    } else newActive = 0;
 	    CabinBuilder::setActive ();
@@ -105,20 +105,7 @@ public:
     if ( enable == 1 and dc != nullptr ) {
 	    /*! Configuração do contador */
 	    dc->setEnable(1);
-	    dc->setCountEnable(0);
-	    dc->setCountModule(module);
-	    dc->doResetQ();
-
-	    setupActive = dc->getActive();
-	    setActive();
-    }
-  }
-
-  void setupCompare(unsigned int module) {
-    if ( enable == 1 and dc != nullptr ) {
-	    /*! Configuração do contador */
-	    dc->setEnable(1);
-	    dc->setCountEnable(0);
+	    dc->setCountEnable(1);
 	    dc->setCountModule(module);
 	    dc->doResetQ();
 

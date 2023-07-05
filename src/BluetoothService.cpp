@@ -32,7 +32,7 @@ class Callback : public BLECharacteristicCallbacks {
         uint8_t number = '0' + value[0];
 
         if (value.length() != 1 || number < ('0'+FLOOR_MIN) || number > ('0'+FLOOR_MAX)) {
-            Serial.println("Comando invalido >:]");
+            Serial.println("Comando invalido >:] ");
             return;
         }
 
@@ -51,7 +51,7 @@ void BluetoothService::setupBluetooth() {
     BLEService *pService = pServer->createService(SERVICE_UUID);
 
     BLECharacteristic *pCharacteristic = pService->createCharacteristic(
-        CHARACTERISTIC_UUID, NIMBLE_PROPERTY::WRITE);
+        CHARACTERISTIC_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE);
 
     pCharacteristic->setCallbacks(new Callback());
 
@@ -59,6 +59,7 @@ void BluetoothService::setupBluetooth() {
     pService->start();
 
     BLEAdvertising *pAdvertising = pServer->getAdvertising();
+    pAdvertising->addServiceUUID(SERVICE_UUID);
     pAdvertising->start();
 
     Serial.println("Characteristic defined! Now you can read it in your phone!");

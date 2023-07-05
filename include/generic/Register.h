@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 /*! ****************************************************************************
  * @copyright   Miguel Grimm <miguelgrimm@gmail>
  *
